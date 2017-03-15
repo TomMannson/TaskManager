@@ -158,9 +158,12 @@ public class TaskManager {
 
             if (service instanceof TaskService.RequestBinder) {
                 TaskService.RequestBinder binder = (TaskService.RequestBinder) service;
-                TaskManager.this.service = binder.getService();
 
+
+                TaskManager.this.service = binder.getService();
                 TaskManager.this.service.configure(configuration);
+                ((TaskService.RequestBinder) service).service.setQueueId(id);
+
                 TaskManager.this.service.start();
                 for (Task task : statusToUpdate) {
                     checkExecutionStatus(task);

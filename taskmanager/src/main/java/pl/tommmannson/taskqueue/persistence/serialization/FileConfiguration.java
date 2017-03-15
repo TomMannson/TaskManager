@@ -11,4 +11,22 @@ import pl.tommmannson.taskqueue.persistence.Configuration;
 public class FileConfiguration extends Configuration {
 
     Context ctx;
+    String filePath;
+
+
+    public Context getCtx() {
+        return ctx;
+    }
+
+    public void setCtx(Context ctx) {
+        this.ctx = ctx;
+    }
+
+    public String getFilePath() {
+        return filePath;
+    }
+
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
+    }
 }

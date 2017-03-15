@@ -2,8 +2,6 @@ package pl.tommmannson.taskqueue.persistence.serialization;
 
 import android.content.Context;
 
-
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -22,13 +20,13 @@ import pl.tommmannson.taskqueue.queues.TaskQueue;
 
 public class FileSerializer implements Serializer {
 
-    String pathToHoldSavedTasks;
+    public String pathToHoldSavedTasks;
 
-    public FileSerializer(Context ctx, String filePath){
-        pathToHoldSavedTasks = new File(ctx.getApplicationContext().getFilesDir(), filePath).getAbsolutePath();
+    public FileSerializer(Context ctx, int idOfManager) {
+        pathToHoldSavedTasks = new File(ctx.getApplicationContext().getFilesDir(), "file_" + idOfManager).getAbsolutePath();
     }
 
-    public synchronized void persist(TaskQueue queue, Task taskToPersist){
+    public synchronized void persist(TaskQueue queue, Task taskToPersist) {
 
         try {
             FileOutputStream fileOut =
@@ -42,7 +40,7 @@ public class FileSerializer implements Serializer {
         }
     }
 
-    public synchronized void restore(final TaskQueue queue){
+    public synchronized void restore(final TaskQueue queue) {
         try {
             FileInputStream fileOut =
                     new FileInputStream(new File(pathToHoldSavedTasks));

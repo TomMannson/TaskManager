@@ -47,7 +47,7 @@ public class TaskService extends Service implements TaskManagementInterface{
 
     @Override
     public void setQueueId(int queueId) {
-
+        taskQueueThread.setQueueId(queueId);
     }
 
     @Override

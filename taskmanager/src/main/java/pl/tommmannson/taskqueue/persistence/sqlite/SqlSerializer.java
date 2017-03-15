@@ -6,7 +6,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,14 +21,13 @@ import pl.tommmannson.taskqueue.queues.TaskQueue;
 
 public class SqlSerializer implements Serializer {
 
-    private final TaskDbHelper dbHelper;
+    private TaskDbHelper dbHelper;
+    private int managerId;
     TaskObjectSerialisator creator = new TaskObjectSerialisator();
 
     public SqlSerializer(Context ctx) {
-        dbHelper = new TaskDbHelper(ctx);
+        dbHelper = SingleSqlHelper.getInstance(ctx);
     }
-
-    publi
 
     @Override
     public void persist(TaskQueue queue, Task taskToPersist) {
@@ -55,7 +53,7 @@ public class SqlSerializer implements Serializer {
             int data = db.update(TaskDbContract.TaskTable.TABLE_NAME,
                     value, TaskDbContract.TaskTable.ID_COLUMN + "=?",
                     new String[]{taskToPersist.getId()});
-            if(data == 0){
+            if (data == 0) {
                 taskToPersist.setCreated(true);
                 long id = db.insert(TaskDbContract.TaskTable.TABLE_NAME, null,
                         value);
@@ -74,7 +72,7 @@ public class SqlSerializer implements Serializer {
             result = dbHelper.getReadableDatabase()
                     .query(TaskDbContract.TaskTable.TABLE_NAME,
                             TaskDbContract.TaskTable.WHERE_SELECT_STAR,
-                            "managerId=?", new String[] { owner, price }, null, null, null);
+                            TaskDbContract.TaskTable.MANAGER_ID+"+?", new String[]{"" + managerId}, null, null, null);
 
             result.getCount();
 
@@ -93,5 +91,10 @@ public class SqlSerializer implements Serializer {
                 result.close();
             }
         }
+    }
+
+    public void setConfig(TaskDbHelper healper, int managerId) {
+        this.dbHelper = healper;
+        this.managerId = managerId;
     }
 }

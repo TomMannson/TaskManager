@@ -18,6 +18,7 @@ public class TaskDbContract {
         public static final String PERSISTENT_COLUMN = "persistent";
         public static final String RETRY_LIMIT_COLUMN = "retry_limit";
         public static final String PRIORITY_COLUMN = "priority";
+        public static final String MANAGER_ID = "manager_id";
         public static final String TASK_DATA_COLUMN = "task_data";
 
         public static final String[] WHERE_SELECT_STAR =  {ID_COLUMN, TASK_DATA_COLUMN };
@@ -32,10 +33,15 @@ public class TaskDbContract {
                     "   " + GROUP_ID_COLUMN + " TEXT,\n" +
                     "   " + PERSISTENT_COLUMN + " INT,\n" +
                     "   " + RETRY_LIMIT_COLUMN + " INT,\n" +
+                    "   " + MANAGER_ID + " INT,\n" +
                     "   " + PRIORITY_COLUMN + " INT,\n" +
                     "   " + TASK_DATA_COLUMN + " BLOB     NOT NULL,\n" +
                     "   " + TASK_STATUS_COLUMN + " INT\n" +
                     ");");
+        }
+
+        public static void onDestroy(SQLiteDatabase db){
+            db.execSQL("Drop Table " + TABLE_NAME +";");
         }
     }
 }

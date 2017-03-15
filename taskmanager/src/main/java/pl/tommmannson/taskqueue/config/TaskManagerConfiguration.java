@@ -65,6 +65,10 @@ public class TaskManagerConfiguration {
         this.logging = logging;
     }
 
+    public int getTaskMethodSerialisation() {
+        return taskMethodSerialisation;
+    }
+
     public static class Builder {
         private Class<? extends TaskService> classOfService;
         private DependencyInjector injector = null;

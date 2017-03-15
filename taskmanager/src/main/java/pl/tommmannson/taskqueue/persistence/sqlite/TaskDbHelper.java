@@ -11,7 +11,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class TaskDbHelper extends SQLiteOpenHelper {
 
     public static final String DB_NAME = "taskDB";
-    public static final int DB_VERSION = 1;
+    public static final int DB_VERSION = 2;
 
     public TaskDbHelper(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
@@ -25,6 +25,7 @@ public class TaskDbHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-
+        TaskDbContract.TaskTable.onDestroy(db);
+        onCreate(db);
     }
 }

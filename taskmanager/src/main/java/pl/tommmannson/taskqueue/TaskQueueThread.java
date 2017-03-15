@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.ThreadPoolExecutor;
 
 import pl.tommmannson.taskqueue.bootstraping.Bootable;
@@ -19,12 +18,12 @@ import pl.tommmannson.taskqueue.config.TaskManagerConfiguration;
 import pl.tommmannson.taskqueue.di.DependencyInjector;
 import pl.tommmannson.taskqueue.persistence.Serializer;
 import pl.tommmannson.taskqueue.persistence.TaskStatus;
+import pl.tommmannson.taskqueue.persistence.serialization.FileSerializer;
 import pl.tommmannson.taskqueue.persistence.sqlite.SqlSerializer;
 import pl.tommmannson.taskqueue.progress.ProgressManager;
 import pl.tommmannson.taskqueue.progress.ProgressManagerFactory;
 import pl.tommmannson.taskqueue.progress.TaskCallback;
 import pl.tommmannson.taskqueue.queues.TaskQueue;
-import pl.tommmannson.taskqueue.utils.Logger;
 
 /**
  * Created by tomasz.krol on 2016-12-06.
@@ -33,6 +32,7 @@ import pl.tommmannson.taskqueue.utils.Logger;
 public class TaskQueueThread implements Bootable, TaskManagementInterface {
 
     static public final Class<?> TAG = TaskQueueThread.class;
+    private final Context ctx;
 
     private Map<String, List<TaskCallback>> callbacks = new HashMap<>();
     final private Map<Task<?>, CancelationToken> cancelation = new HashMap<>();
@@ -46,9 +46,10 @@ public class TaskQueueThread implements Bootable, TaskManagementInterface {
     private boolean tasksLoadedFlag;
     private boolean logger;
     private int queueId;
+    private int serialisationType;
 
     public TaskQueueThread(Context ctx){
-        serializer = new SqlSerializer(ctx.getApplicationContext());
+        this.ctx = ctx;
     }
 
     public void start() {
@@ -58,6 +59,12 @@ public class TaskQueueThread implements Bootable, TaskManagementInterface {
     @Override
     public void setQueueId(int queueId) {
         this.queueId = queueId;
+        if(serialisationType == TaskManagerConfiguration.FILE_SERIALIZABLE){
+            serializer = new FileSerializer(ctx, queueId);
+        }
+        else{
+            serializer = new SqlSerializer(ctx.getApplicationContext());
+        }
     }
 
     @Override
@@ -251,6 +258,7 @@ public class TaskQueueThread implements Bootable, TaskManagementInterface {
         this.injector = configuration.getInjector();
         this.workerThreadCount = configuration.getMaxWorkerCount();
         this.logger = configuration.getLogging();
+        this.serialisationType = configuration.getTaskMethodSerialisation();
     }
 
     public void shutdown() {

@@ -15,6 +15,4 @@ public interface Serializer {
     void persist(TaskQueue queue, Task taskToPersist);
 
     void restore(TaskQueue queue);
-
-    void configure(Configuration config);
 }
