@@ -1,1 +1,1 @@
-include ':taskqueue', ':taskqueuesample'
+include ':taskmanager', ':taskqueuesample'

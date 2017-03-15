@@ -1,48 +1,45 @@
 package pl.tommmannson.taskqueuesample;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Toast;
 
 import pl.tommmannson.taskqueue.Task;
 import pl.tommmannson.taskqueue.TaskContainer;
 import pl.tommmannson.taskqueue.TaskManager;
+import pl.tommmannson.taskqueue.TaskResult;
 import pl.tommmannson.taskqueue.progress.TaskCallback;
 
-public class MainActivity extends AppCompatActivity implements TaskCallback<Void> {
+public class MainActivity extends AppCompatActivity implements TaskCallback, TaskContainer.TaskContainerCallback {
 
-    SampleTask task = new SampleTask();
+    final static String downloadItemsRequest = "downloadItemsRequest";
+    SampleTask task = null;//new SampleTask();
+    SampleTask2 task2 = new SampleTask2();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        final SharedPreferences prefs = getSharedPreferences("global", Context.MODE_PRIVATE);
+//        final SharedPreferences prefs = getSharedPreferences("global", Context.MODE_PRIVATE);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-//        String taskId = prefs.getString(SampleTask.class.getCanonicalName(), null);
-//        if(taskId != null){
-//            TaskContainer<SampleTask> taskcontainer = SampleTask.findById(taskId);
-//            if(taskcontainer.isReady()){
-//                task = taskcontainer.getTask();
-//            }
-//            else{
-//                taskcontainer.executeAsync(new TaskContainer.TaskContainerCallback<SampleTask>() {
-//                    @Override
-//                    public void onTaskLoaded(SampleTask task) {
-//                        MainActivity.this.task = task;
-//                    }
-//                });
-//            }
-//        }
+        task = new SampleTask();
+        task.setId(downloadItemsRequest);
+
+        TaskContainer<SampleTask> taskcontainer = TaskManager.DEFAULT.findTaskById(downloadItemsRequest);
+        if (taskcontainer.isReady()) {
+            task = taskcontainer.getTask();
+            TaskManager.DEFAULT.registerCallback(task, MainActivity.this);
+        } else {
+            taskcontainer.executeAsync(this);
+        }
 
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -52,12 +49,12 @@ public class MainActivity extends AppCompatActivity implements TaskCallback<Void
                 Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
 
-                if(task == null) {
-                    task = new SampleTask();
-                    SharedPreferences.Editor editor = prefs.edit();
-                    editor.putString(task.getClass().getCanonicalName(), task.getId());
-                    editor.apply();
-                }
+//                if (task == null) {
+//
+////                    SharedPreferences.Editor editor = prefs.edit();
+////                    editor.putString(task.getClass().getCanonicalName(), task.getId());
+////                    editor.apply();
+//                }
 
                 task.run();
 
@@ -101,12 +98,24 @@ public class MainActivity extends AppCompatActivity implements TaskCallback<Void
     }
 
     @Override
-    public void onResult(Void result) {
+    public void onResult(String id, TaskResult result) {
+        switch (id) {
+            case downloadItemsRequest: {
+
+            }
+        }
+        Void data = task.getTaskResult(result);
+        Toast.makeText(this, "finished", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onError(String id, Throwable ex) {
 
     }
 
     @Override
-    public void onError(Throwable ex) {
-
+    public void onTaskLoaded(Task task) {
+        MainActivity.this.task = (SampleTask) task;
+        TaskManager.DEFAULT.registerCallback(task, MainActivity.this);
     }
 }

@@ -20,6 +20,9 @@ allprojects {
         maven {
             url "http://192.168.2.18:8081/repository/maven-snapshots/"
         }
+        maven {
+            url 'https://dl.bintray.com/tommannson/maven/'
+        }
     }
 }
 

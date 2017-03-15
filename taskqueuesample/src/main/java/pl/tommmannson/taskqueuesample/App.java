@@ -18,6 +18,7 @@ public class App extends Application {
         TaskManager taskManager = new TaskManager(new TaskManagerConfiguration.Builder()
                 .setClassOfService(TaskService.class)
                 .setMaxWorkerCount(4)
+                .setTaskMethodSerialisation(TaskManagerConfiguration.SQLITE_SERIALIZABLE)
 //                .setThreadPoolMode(getApplicationContext())
                 .build());
         taskManager.start(getApplicationContext());
