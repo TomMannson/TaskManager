@@ -10,6 +10,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import com.birbit.android.jobqueue.JobManager;
+import com.birbit.android.jobqueue.Params;
+
 import pl.tommmannson.taskqueue.Task;
 import pl.tommmannson.taskqueue.TaskContainer;
 import pl.tommmannson.taskqueue.TaskManager;
@@ -32,33 +35,28 @@ public class MainActivity extends AppCompatActivity implements TaskCallback, Tas
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        task = new SampleTask();
-        task.setId(downloadItemsRequest);
+//        task = new SampleTask();
+//        task.setId(downloadItemsRequest);
+//        task2.setId("secondTask");
 
-        TaskContainer<SampleTask> taskcontainer = manager.findTaskById(downloadItemsRequest);
-        if (taskcontainer.isReady()) {
-            task = taskcontainer.getTask();
-            manager.registerCallback(task, MainActivity.this);
-        } else {
-            taskcontainer.executeAsync(this);
-        }
+//        TaskContainer<SampleTask> taskcontainer = manager.findTaskById(downloadItemsRequest);
+//        if (taskcontainer.isReady()) {
+//            task = taskcontainer.getTask();
+//            manager.registerCallback(task, MainActivity.this);
+//        } else {
+//            taskcontainer.executeAsync(this);
+//        }
 
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+//                        .setAction("Action", null).show();
 
-//                if (task == null) {
-//
-////                    SharedPreferences.Editor editor = prefs.edit();
-////                    editor.putString(task.getClass().getCanonicalName(), task.getId());
-////                    editor.apply();
-//                }
-
-                task.run(1);
+                new SampleTask().run(1);
+//                App.JOB_MANAGER.addJobInBackground(new SampleJob(new Params(1)));
 
 
             }
@@ -68,13 +66,15 @@ public class MainActivity extends AppCompatActivity implements TaskCallback, Tas
     @Override
     protected void onResume() {
         super.onResume();
-        manager.registerCallback(task, this);
+//        manager.registerCallback(task, this);
+//        manager.registerCallback(task2, this);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        manager.unregisterCallback(task, this);
+//        manager.unregisterCallback(task, this);
+//        manager.unregisterCallback(task2, this);
     }
 
     @Override
@@ -103,11 +103,15 @@ public class MainActivity extends AppCompatActivity implements TaskCallback, Tas
     public void onResult(String id, TaskResult result) {
         switch (id) {
             case downloadItemsRequest: {
-
+                Void data = task.getTaskResult(result);//result.getResultData(Void.class);
+                Toast.makeText(this, "finished", Toast.LENGTH_SHORT).show();
+                break;
+            }
+            default:{
+                Toast.makeText(this, "secondTask", Toast.LENGTH_SHORT).show();
             }
         }
-        Void data = task.getTaskResult(result);
-        Toast.makeText(this, "finished", Toast.LENGTH_SHORT).show();
+
     }
 
     @Override

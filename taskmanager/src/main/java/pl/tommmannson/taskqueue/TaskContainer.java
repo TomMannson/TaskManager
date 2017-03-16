@@ -31,11 +31,12 @@ public class TaskContainer<T extends Task> {
         Thread t = new Thread(){
             @Override
             public void run() {
-                while (TaskManager.DEFAULT.service == null || !TaskManager.DEFAULT.service.tasksLoaded()){
+                TaskManager taskManager = TaskManager.getInstance(managerId);
+                while (taskManager.service == null){
                     Thread.yield();
                 }
 
-                final Task task = TaskManager.DEFAULT.service.findTaskById(idForQuery);
+                final Task task = taskManager.service.findTaskById(idForQuery);
                 Handler h = new Handler(Looper.getMainLooper());
                 h.post(new Runnable() {
                     @Override
@@ -52,12 +53,12 @@ public class TaskContainer<T extends Task> {
         this.idForQuery = idForQuery;
     }
 
-    public String getIdForQuery() {
-        return idForQuery;
-    }
-
     public boolean isReady() {
         return ready;
+    }
+
+    public void setManager(TaskManager manager) {
+        this.managerId = manager.getId();
     }
 
     public interface TaskContainerCallback{

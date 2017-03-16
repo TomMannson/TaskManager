@@ -145,6 +145,10 @@ public abstract class Task<T> implements Serializable {
         return taskStatus;
     }
 
+    public TaskStatus getLastStatus(){
+        return taskStatus;
+    }
+
     public TaskStatus getTaskStatus(int managerId){
         if(!isAttached){
             TaskManager manager = TaskManager.getInstance(managerId);
@@ -230,9 +234,6 @@ public abstract class Task<T> implements Serializable {
     }
 
     public T getTaskResult(TaskResult resultData) {
-        if(this.getClass() != resultData.getTargetType()){
-            throw new RuntimeException("source and destination task is diffrent");
-        }
         return (T) resultData.getResultDataRaw();
     }
 }

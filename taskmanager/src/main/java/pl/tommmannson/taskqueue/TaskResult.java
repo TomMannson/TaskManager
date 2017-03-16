@@ -5,7 +5,7 @@ import java.io.Serializable;
 /**
  * Created by tomasz.krol on 2015-11-20.
  */
-public class TaskResult<RESULT > implements Serializable {
+public class TaskResult<RESULT> implements Serializable {
 
     public static final int TYPE_STARTED = 0;
     public static final int TYPE_PROGRESS = 1;
@@ -15,7 +15,7 @@ public class TaskResult<RESULT > implements Serializable {
     public static final int TYPE_CANCEL = 5;
 
     private Class<?> targetClazz;
-    protected RESULT resultData;
+    protected Object resultData;
     protected int typeOfMessage;
 
     public TaskResult(RESULT data, int type){
@@ -52,11 +52,6 @@ public class TaskResult<RESULT > implements Serializable {
         return new TaskResult<>(result, TYPE_CANCEL);
     }
 
-
-
-    public <T> T getResultData() {
-        return (T)resultData;
-    }
 
     Object getResultDataRaw() {
         return resultData;

@@ -130,6 +130,7 @@ public class TaskManager {
             container.setReady(true);
         } else {
             container.setIdForQuery(id);
+            container.setManager(this);
             container.setReady(false);
         }
         return container;
@@ -159,12 +160,12 @@ public class TaskManager {
             if (service instanceof TaskService.RequestBinder) {
                 TaskService.RequestBinder binder = (TaskService.RequestBinder) service;
 
+                TaskManagementInterface bindedService = binder.getService();
+                bindedService.configure(configuration);
+                bindedService.setQueueId(id);
+                bindedService.start();
 
-                TaskManager.this.service = binder.getService();
-                TaskManager.this.service.configure(configuration);
-                ((TaskService.RequestBinder) service).service.setQueueId(id);
-
-                TaskManager.this.service.start();
+                TaskManager.this.service = bindedService;
                 for (Task task : statusToUpdate) {
                     checkExecutionStatus(task);
                 }
@@ -187,6 +188,7 @@ public class TaskManager {
             instances.put(id, manager);
         }
 
+        manager.start(config.getContext());
         return manager;
     }
 

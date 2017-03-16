@@ -32,7 +32,7 @@ public class Bootstraper {
         for (Task task : concurrentTaskQueue.getFullList()) {
             tasks.put(task.getId(), task);
 
-            if (TaskStatusHelper.taskAfterExecution(task.getTaskStatus()) ||
+            if (TaskStatusHelper.taskAfterExecution(task.getLastStatus()) ||
                     task.getTaskStatus() == TaskStatus.Canceled) {
                 concurrentTaskQueue.removeWaiting(task);
             }

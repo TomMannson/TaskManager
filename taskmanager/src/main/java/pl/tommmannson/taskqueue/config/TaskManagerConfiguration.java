@@ -18,6 +18,7 @@ import static pl.tommmannson.taskqueue.config.TaskManagerConfiguration.SQLITE_SE
  */
 public class TaskManagerConfiguration {
 
+    private final Context ctx;
     Class<? extends TaskService> classOfService;
 
     DependencyInjector injector;
@@ -28,17 +29,18 @@ public class TaskManagerConfiguration {
     private boolean logging;
 
     TaskManagerConfiguration(Class<? extends TaskService> classOfService, DependencyInjector injector, int maxWorkerCount,
-                             int taskMethodSerialisation) {
-        this(classOfService, injector, maxWorkerCount, taskMethodSerialisation, false);
+                             int taskMethodSerialisation, Context ctx) {
+        this(classOfService, injector, maxWorkerCount, taskMethodSerialisation, false, ctx);
     }
 
     TaskManagerConfiguration(Class<? extends TaskService> classOfService, DependencyInjector injector, int maxWorkerCount,
-                             int taskMethodSerialisation, boolean threadPoolMode) {
+                             int taskMethodSerialisation, boolean threadPoolMode, Context ctx) {
         this.classOfService = classOfService;
         this.injector = injector;
         this.maxWorkerCount = maxWorkerCount;
         this.taskMethodSerialisation = taskMethodSerialisation;
         this.threadPoolMode = threadPoolMode;
+        this.ctx = ctx;
     }
 
     public Class<? extends TaskService> getClassOfService() {
@@ -69,12 +71,22 @@ public class TaskManagerConfiguration {
         return taskMethodSerialisation;
     }
 
+    public Context getContext() {
+        return ctx;
+    }
+
     public static class Builder {
+
         private Class<? extends TaskService> classOfService;
         private DependencyInjector injector = null;
         private int maxWorkerCount = 3;
         private int taskMethodSerialisation;
         private boolean threadPoolMode;
+        private Context ctx;
+
+        public Builder(Context ctx) {
+            this.ctx = ctx;
+        }
 
         public Builder setClassOfService(Class<? extends TaskService> classOfService) {
             this.classOfService = classOfService;
@@ -97,13 +109,8 @@ public class TaskManagerConfiguration {
             return this;
         }
 
-        public Builder setThreadPoolMode(Context ctx) {
-            this.threadPoolMode = true;
-            return this;
-        }
-
-        public Builder setServiceMode(Context ctx) {
-            this.threadPoolMode = false;
+        public Builder setQueueExecutionMode(@QueueMode int mode) {
+            this.threadPoolMode = mode == THREAD_POOL_QUEUE;
             return this;
         }
 
@@ -113,7 +120,7 @@ public class TaskManagerConfiguration {
             }
 
             return new TaskManagerConfiguration(classOfService, injector, maxWorkerCount, taskMethodSerialisation,
-                    threadPoolMode);
+                    threadPoolMode, ctx);
         }
     }
 
@@ -122,4 +129,10 @@ public class TaskManagerConfiguration {
     public @interface NavigationMode {}
     public static final int FILE_SERIALIZABLE = 0;
     public static final int SQLITE_SERIALIZABLE = 1;
+
+    @Retention(SOURCE)
+    @IntDef({SERVICE_QUEUE, THREAD_POOL_QUEUE})
+    public @interface QueueMode {}
+    public static final int SERVICE_QUEUE = 0;
+    public static final int THREAD_POOL_QUEUE = 1;
 }
