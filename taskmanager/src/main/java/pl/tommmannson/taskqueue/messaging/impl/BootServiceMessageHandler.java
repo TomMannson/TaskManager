@@ -21,9 +21,10 @@ public class BootServiceMessageHandler implements MessageHandler<BootServiceMess
 
         if (configuration.isThreadPoolMode()) {
             TaskQueueThread service = new TaskQueueThread(message.getAppContext());
-            service.setQueueId(manager.getId());
+
             manager.setService(service);
             manager.getService().configure(configuration);
+            service.setQueueId(manager.getId());
             manager.getService().start();
 //            messageDispatcher.dispatch();
         } else {

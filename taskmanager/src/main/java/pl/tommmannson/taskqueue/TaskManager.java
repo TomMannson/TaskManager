@@ -177,7 +177,7 @@ public class TaskManager {
         }
     }
 
-    public static TaskManager getInstance(int id, TaskManagerConfiguration config) {
+    public static TaskManager createInstance(int id, TaskManagerConfiguration config) {
 
         TaskManager manager = instances.get(id);
 
@@ -186,6 +186,13 @@ public class TaskManager {
             manager.setId(id);
             instances.put(id, manager);
         }
+
+        return manager;
+    }
+
+    public static TaskManager getInstance(int id) {
+
+        TaskManager manager = instances.get(id);
 
         return manager;
     }

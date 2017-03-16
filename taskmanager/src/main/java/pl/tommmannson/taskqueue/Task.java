@@ -115,7 +115,6 @@ public abstract class Task<T> implements Serializable {
 
     public void setId(String uuid){
         id = uuid;
-        getTaskStatus();
     }
 
     boolean nextRetry(){
@@ -134,6 +133,21 @@ public abstract class Task<T> implements Serializable {
     public TaskStatus getTaskStatus(){
         if(!isAttached){
             TaskManager manager = TaskManager.DEFAULT;
+            if(manager != null){
+                taskStatus = manager.checkExecutionStatus(this);
+                return taskStatus;
+            }
+            else {
+                return TaskStatus.NotExistsInQueue;
+            }
+        }
+
+        return taskStatus;
+    }
+
+    public TaskStatus getTaskStatus(int managerId){
+        if(!isAttached){
+            TaskManager manager = TaskManager.getInstance(managerId);
             if(manager != null){
                 taskStatus = manager.checkExecutionStatus(this);
                 return taskStatus;

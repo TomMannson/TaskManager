@@ -21,11 +21,13 @@ public class MainActivity extends AppCompatActivity implements TaskCallback, Tas
     final static String downloadItemsRequest = "downloadItemsRequest";
     SampleTask task = null;//new SampleTask();
     SampleTask2 task2 = new SampleTask2();
+    TaskManager manager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        final SharedPreferences prefs = getSharedPreferences("global", Context.MODE_PRIVATE);
+        manager = TaskManager.getInstance(1);
+
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -33,10 +35,10 @@ public class MainActivity extends AppCompatActivity implements TaskCallback, Tas
         task = new SampleTask();
         task.setId(downloadItemsRequest);
 
-        TaskContainer<SampleTask> taskcontainer = TaskManager.DEFAULT.findTaskById(downloadItemsRequest);
+        TaskContainer<SampleTask> taskcontainer = manager.findTaskById(downloadItemsRequest);
         if (taskcontainer.isReady()) {
             task = taskcontainer.getTask();
-            TaskManager.DEFAULT.registerCallback(task, MainActivity.this);
+            manager.registerCallback(task, MainActivity.this);
         } else {
             taskcontainer.executeAsync(this);
         }
@@ -56,7 +58,7 @@ public class MainActivity extends AppCompatActivity implements TaskCallback, Tas
 ////                    editor.apply();
 //                }
 
-                task.run();
+                task.run(1);
 
 
             }
@@ -66,13 +68,13 @@ public class MainActivity extends AppCompatActivity implements TaskCallback, Tas
     @Override
     protected void onResume() {
         super.onResume();
-        TaskManager.DEFAULT.registerCallback(task, this);
+        manager.registerCallback(task, this);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        TaskManager.DEFAULT.unregisterCallback(task, this);
+        manager.unregisterCallback(task, this);
     }
 
     @Override
@@ -114,8 +116,12 @@ public class MainActivity extends AppCompatActivity implements TaskCallback, Tas
     }
 
     @Override
-    public void onTaskLoaded(Task task) {
+    public void onTaskLoaded(String id, Task task) {
         MainActivity.this.task = (SampleTask) task;
-        TaskManager.DEFAULT.registerCallback(task, MainActivity.this);
+        if(task == null){
+            this.task = new SampleTask();
+            this.task.setId(downloadItemsRequest);
+        }
+        manager.registerCallback(task, MainActivity.this);
     }
 }

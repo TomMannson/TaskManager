@@ -25,8 +25,9 @@ public class SqlSerializer implements Serializer {
     private int managerId;
     TaskObjectSerialisator creator = new TaskObjectSerialisator();
 
-    public SqlSerializer(Context ctx) {
+    public SqlSerializer(Context ctx, int managerId) {
         dbHelper = SingleSqlHelper.getInstance(ctx);
+        this.managerId = managerId;
     }
 
     @Override
@@ -42,6 +43,7 @@ public class SqlSerializer implements Serializer {
             return;
         }
 
+        value.put(TaskDbContract.TaskTable.MANAGER_ID, "" + managerId);
         if (taskToPersist.getTaskStatus() == TaskStatus.NotExistsInQueue) {
             taskToPersist.setCreated(true);
             long id = db.insert(TaskDbContract.TaskTable.TABLE_NAME, null,
@@ -72,7 +74,7 @@ public class SqlSerializer implements Serializer {
             result = dbHelper.getReadableDatabase()
                     .query(TaskDbContract.TaskTable.TABLE_NAME,
                             TaskDbContract.TaskTable.WHERE_SELECT_STAR,
-                            TaskDbContract.TaskTable.MANAGER_ID+"+?", new String[]{"" + managerId}, null, null, null);
+                            TaskDbContract.TaskTable.MANAGER_ID + "=?", new String[]{"" + managerId}, null, null, null);
 
             result.getCount();
 
@@ -91,10 +93,5 @@ public class SqlSerializer implements Serializer {
                 result.close();
             }
         }
-    }
-
-    public void setConfig(TaskDbHelper healper, int managerId) {
-        this.dbHelper = healper;
-        this.managerId = managerId;
     }
 }

@@ -11,7 +11,7 @@ public class TaskContainer<T extends Task> {
     private T task;
     private boolean ready;
     private String idForQuery;
-    private Class<T> classForQuery;
+    private int managerId;
 
     public T getTask() {
         return task;
@@ -40,7 +40,7 @@ public class TaskContainer<T extends Task> {
                 h.post(new Runnable() {
                     @Override
                     public void run() {
-                        listener.onTaskLoaded(task);
+                        listener.onTaskLoaded(idForQuery, task);
                     }
                 });
             }
@@ -61,6 +61,6 @@ public class TaskContainer<T extends Task> {
     }
 
     public interface TaskContainerCallback{
-        void onTaskLoaded(Task task);
+        void onTaskLoaded(String taskId, Task task);
     }
 }

@@ -16,11 +16,19 @@ public class App extends Application {
     public void onCreate() {
         super.onCreate();
         TaskManager taskManager = new TaskManager(new TaskManagerConfiguration.Builder()
-                .setClassOfService(TaskService.class)
+//                .setClassOfService(TaskService.class)
                 .setMaxWorkerCount(4)
                 .setTaskMethodSerialisation(TaskManagerConfiguration.SQLITE_SERIALIZABLE)
-//                .setThreadPoolMode(getApplicationContext())
+                .setThreadPoolMode(getApplicationContext())
                 .build());
         taskManager.start(getApplicationContext());
+
+        TaskManager taskManager2 = TaskManager.createInstance(1, new TaskManagerConfiguration.Builder()
+//                .setClassOfService(TaskService.class)
+                .setMaxWorkerCount(4)
+                .setTaskMethodSerialisation(TaskManagerConfiguration.SQLITE_SERIALIZABLE)
+                .setThreadPoolMode(getApplicationContext())
+                .build());
+        taskManager2.start(getApplicationContext());
     }
 }

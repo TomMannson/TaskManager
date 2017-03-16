@@ -21,7 +21,7 @@ public class TaskDbContract {
         public static final String MANAGER_ID = "manager_id";
         public static final String TASK_DATA_COLUMN = "task_data";
 
-        public static final String[] WHERE_SELECT_STAR =  {ID_COLUMN, TASK_DATA_COLUMN };
+        public static final String[] WHERE_SELECT_STAR =  {ID_COLUMN, TASK_DATA_COLUMN, MANAGER_ID};
 
         public static final String TASK_STATUS_COLUMN = "task_status";
 

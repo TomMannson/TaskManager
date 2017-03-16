@@ -63,7 +63,7 @@ public class TaskQueueThread implements Bootable, TaskManagementInterface {
             serializer = new FileSerializer(ctx, queueId);
         }
         else{
-            serializer = new SqlSerializer(ctx.getApplicationContext());
+            serializer = new SqlSerializer(ctx.getApplicationContext(), queueId);
         }
     }
 
