@@ -13,5 +13,6 @@ public enum TaskStatus implements Serializable {
     Canceled,
     SuccessfullyFinished,
     FailFinished,
+    ReadyForDestroy
 }
 

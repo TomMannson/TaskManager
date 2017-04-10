@@ -16,7 +16,6 @@ import pl.tommmannson.taskqueue.persistence.Serializer;
  */
 public class ConcurrentTaskQueue implements TaskQueue {
 
-
     private BlockingQueue<Task<?>> workQueue = null;
     private BlockingQueue<Task<?>> uniqueTasks = null;
 
@@ -27,10 +26,7 @@ public class ConcurrentTaskQueue implements TaskQueue {
         }
     };
 
-    Serializer serializer;
-
-    public ConcurrentTaskQueue(Serializer serializer /*String path*/){
-        this.serializer = serializer;
+    public ConcurrentTaskQueue(){
         this.workQueue = new PriorityBlockingQueue<>(100 , DEFAULT_TASK_COMPARATOR);
         this.uniqueTasks = new LinkedBlockingQueue<>(100);
     }
@@ -56,8 +52,8 @@ public class ConcurrentTaskQueue implements TaskQueue {
         if (task.isUnique() || task.getGroupId() != null) {
             uniqueTasks.add(task);
         }
-        workQueue.take();
 
+        workQueue.take();
         return task;
     }
 
@@ -91,54 +87,4 @@ public class ConcurrentTaskQueue implements TaskQueue {
     public void addFullList(List<Task<?>> listToAdd) {
         workQueue.addAll(listToAdd);
     }
-
-//    public synchronized void persist(){
-//        try {
-//            FileOutputStream fileOut =
-//                    new FileOutputStream(new File(pathToHoldSavedTasks));
-//            ObjectOutputStream out = new ObjectOutputStream(fileOut);
-//            BackupTasksManager cache = new BackupTasksManager();
-//            cache.setWorkQueue(workQueue);
-//            cache.setUniqueTasks(uniqueTasks);
-//            out.writeObject(cache);
-//            out.close();
-//            fileOut.close();
-//        } catch (IOException ex) {
-//            ex.toString();
-//        }
-//    }
-//
-//    public synchronized void load(){
-//        loadingBackapedTasksInProgress = true;
-//        new Thread() {
-//            public void run() {
-//                try {
-//                    FileInputStream fileOut =
-//                            new FileInputStream(new File(pathToHoldSavedTasks));
-//                    ObjectInputStream in = new ObjectInputStream(fileOut);
-//                    BackupTasksManager cache = (BackupTasksManager) in.readObject();
-//                    workQueue.addAll(cache.getWorkQueue());
-//                    workQueue.addAll(cache.getUniqueTasks());
-//                    fileOut.close();
-//                } catch (IOException ex) {
-//                    ex.toString();
-//                } catch (ClassNotFoundException e) {
-//                    e.printStackTrace();
-//                }
-//                loadingBackapedTasksInProgress = false;
-//            }
-//        }.start();
-//    }
-//
-//    public synchronized boolean isLoadingBackapedTasksInProgress(){
-//        return this.loadingBackapedTasksInProgress;
-//    }
-
-    public List<Task> getAllTasks(){
-        List<Task> tasks = new ArrayList<>();
-        tasks.addAll(workQueue);
-        tasks.addAll(uniqueTasks);
-        return tasks;
-    }
-
 }

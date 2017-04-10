@@ -2,7 +2,6 @@ package pl.tommmannson.taskqueuesample;
 
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -10,16 +9,15 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
-import com.birbit.android.jobqueue.JobManager;
-import com.birbit.android.jobqueue.Params;
+import java.util.Map;
 
 import pl.tommmannson.taskqueue.Task;
-import pl.tommmannson.taskqueue.TaskContainer;
+import pl.tommmannson.taskqueue.TaskQuery;
 import pl.tommmannson.taskqueue.TaskManager;
 import pl.tommmannson.taskqueue.TaskResult;
 import pl.tommmannson.taskqueue.progress.TaskCallback;
 
-public class MainActivity extends AppCompatActivity implements TaskCallback, TaskContainer.TaskContainerCallback {
+public class MainActivity extends AppCompatActivity implements TaskCallback, TaskQuery.TaskContainerCallback {
 
     final static String downloadItemsRequest = "downloadItemsRequest";
     SampleTask task = null;//new SampleTask();
@@ -39,7 +37,7 @@ public class MainActivity extends AppCompatActivity implements TaskCallback, Tas
 //        task.setId(downloadItemsRequest);
 //        task2.setId("secondTask");
 
-//        TaskContainer<SampleTask> taskcontainer = manager.findTaskById(downloadItemsRequest);
+//        TaskQuery<SampleTask> taskcontainer = manager.findTaskById(downloadItemsRequest);
 //        if (taskcontainer.isReady()) {
 //            task = taskcontainer.getTask();
 //            manager.registerCallback(task, MainActivity.this);
@@ -103,7 +101,7 @@ public class MainActivity extends AppCompatActivity implements TaskCallback, Tas
     public void onResult(String id, TaskResult result) {
         switch (id) {
             case downloadItemsRequest: {
-                Void data = task.getTaskResult(result);//result.getResultData(Void.class);
+                task.getTaskResult(result);//result.getResultData(Void.class);
                 Toast.makeText(this, "finished", Toast.LENGTH_SHORT).show();
                 break;
             }
@@ -111,7 +109,6 @@ public class MainActivity extends AppCompatActivity implements TaskCallback, Tas
                 Toast.makeText(this, "secondTask", Toast.LENGTH_SHORT).show();
             }
         }
-
     }
 
     @Override
@@ -120,7 +117,7 @@ public class MainActivity extends AppCompatActivity implements TaskCallback, Tas
     }
 
     @Override
-    public void onTaskLoaded(String id, Task task) {
+    public void onTaskLoaded(Map<String, Task> result) {
         MainActivity.this.task = (SampleTask) task;
         if(task == null){
             this.task = new SampleTask();

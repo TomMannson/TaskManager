@@ -19,11 +19,9 @@ import pl.tommmannson.taskqueue.utils.TaskStatusHelper;
 public class Bootstraper {
 
     public static void start(final Bootable bootstrapable) {
-//        new Thread() {
-//            public void run() {
 
         Serializer serializer = bootstrapable.getSerializer();
-        TaskQueue concurrentTaskQueue = new ConcurrentTaskQueue(serializer);
+        TaskQueue concurrentTaskQueue = new ConcurrentTaskQueue();
         Map<String, Task<?>> tasks = bootstrapable.getTasks();
 
         bootstrapable.setConcurrentTaskQueue(concurrentTaskQueue);
@@ -49,8 +47,6 @@ public class Bootstraper {
         bootstrapable.setWorkerThreadPool(workerThreadPool);
 
         workerThreadPool.execute(bootstrapable);
-//            }
-//        }.start();
     }
 
 }

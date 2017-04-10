@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.ServiceConnection;
 import android.os.IBinder;
 
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -121,18 +120,17 @@ public class TaskManager {
         }
     }
 
-    public <T extends Task> TaskContainer<T> findTaskById(String id) {
-        T task = null;
-        TaskContainer<T> container = new TaskContainer<>();
-        if (service != null) {
-            task = (T) service.findTaskById(id);
-            container.setTask(task);
-            container.setReady(true);
-        } else {
-            container.setIdForQuery(id);
-            container.setManager(this);
-            container.setReady(false);
-        }
+    public TaskQuery findTaskById(String id) {
+        TaskQuery container = new TaskQuery();
+        container.setIdForQuery(new String[]{id});
+        container.setManager(this);
+        return container;
+    }
+
+    public TaskQuery findTaskById(String[] ids) {
+        TaskQuery container = new TaskQuery();
+        container.setIdForQuery(ids);
+        container.setManager(this);
         return container;
     }
 

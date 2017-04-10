@@ -3,7 +3,6 @@ package pl.tommmannson.taskqueue;
 
 import android.support.annotation.NonNull;
 
-import java.io.InvalidClassException;
 import java.io.Serializable;
 import java.util.UUID;
 
@@ -18,11 +17,15 @@ import pl.tommmannson.taskqueue.progress.ProgressManager;
 public abstract class Task<T> implements Serializable {
 
     private String id;
+    private long updateTime;
     private boolean isUnique;
     private String groupId;
     private boolean persistent;
     private int retryLimit = 0;
     private int priority = 0;
+    private TaskResult<T> taskResult;
+    private Throwable taskException;
+
 
     transient private boolean isAttached = false;
     private TaskStatus taskStatus = TaskStatus.NotExistsInQueue;
@@ -165,6 +168,7 @@ public abstract class Task<T> implements Serializable {
     }
 
     synchronized void setTaskStatus(TaskStatus status){
+        updateTime = System.currentTimeMillis();
         taskStatus = status;
     }
 
@@ -189,11 +193,13 @@ public abstract class Task<T> implements Serializable {
     }
 
     protected void notifyResult(TaskResult<T> data){
+        taskResult = data;
         manager.postResult(getId(), data);
         data.setTargetType(this.getClass());
     }
 
     protected void notifyError(Throwable ex){
+        taskException = ex;
         manager.onError(getId(), ex);
     }
 
@@ -233,7 +239,7 @@ public abstract class Task<T> implements Serializable {
         return String.format("Task %s, lastStatus %s", this.getClass().getSimpleName(), this.taskStatus.toString());
     }
 
-    public T getTaskResult(TaskResult resultData) {
-        return (T) resultData.getResultDataRaw();
+    public T getTaskResult(TaskResult<T> resultData) {
+        return resultData.getResultData();
     }
 }

@@ -57,7 +57,7 @@ public class TaskResult<RESULT> implements Serializable {
         return resultData;
     }
 
-    public <T> T getResultData(Class<T> clazz) {
+    public <T> T getResultData() {
         return (T) resultData;
     }
 

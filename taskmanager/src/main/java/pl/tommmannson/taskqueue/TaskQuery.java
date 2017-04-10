@@ -3,29 +3,16 @@ package pl.tommmannson.taskqueue;
 import android.os.Handler;
 import android.os.Looper;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Created by tomasz.krol on 2016-11-04.
  */
-public class TaskContainer<T extends Task> {
+public class TaskQuery {
 
-    private T task;
-    private boolean ready;
-    private String idForQuery;
+    private String[] idForQuery;
     private int managerId;
-
-    public T getTask() {
-        return task;
-    }
-
-    public void setTask(T task) {
-        this.task = task;
-    }
-
-    public void setReady(boolean ready) {
-        this.ready = ready;
-    }
-
-
 
     public void executeAsync(final TaskContainerCallback listener){
         Thread t = new Thread(){
@@ -36,12 +23,15 @@ public class TaskContainer<T extends Task> {
                     Thread.yield();
                 }
 
-                final Task task = taskManager.service.findTaskById(idForQuery);
+                Task task = taskManager.service.findTaskById(idForQuery[0]);
+                final Map<String, Task> result = new HashMap<>();
+                result.put(idForQuery[0], task);
+
                 Handler h = new Handler(Looper.getMainLooper());
                 h.post(new Runnable() {
                     @Override
                     public void run() {
-                        listener.onTaskLoaded(idForQuery, task);
+                        listener.onTaskLoaded(result);
                     }
                 });
             }
@@ -49,12 +39,8 @@ public class TaskContainer<T extends Task> {
         t.start();
     }
 
-    public void setIdForQuery(String idForQuery) {
+    public void setIdForQuery(String[] idForQuery) {
         this.idForQuery = idForQuery;
-    }
-
-    public boolean isReady() {
-        return ready;
     }
 
     public void setManager(TaskManager manager) {
@@ -62,6 +48,6 @@ public class TaskContainer<T extends Task> {
     }
 
     public interface TaskContainerCallback{
-        void onTaskLoaded(String taskId, Task task);
+        void onTaskLoaded(Map<String, Task> result);
     }
 }
