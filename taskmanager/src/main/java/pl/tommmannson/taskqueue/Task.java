@@ -16,6 +16,7 @@ import pl.tommmannson.taskqueue.progress.ProgressManager;
  */
 public abstract class Task<T> implements Serializable {
 
+    private TaskManager taskmanager;
     private String id;
     private long updateTime;
     private boolean isUnique;
@@ -33,7 +34,7 @@ public abstract class Task<T> implements Serializable {
     private boolean created = false;
 
     protected Task(TaskParams params) {
-        if(params == null){
+        if (params == null) {
             params = new TaskParams();
         }
         this.persistent = params.isPersistent();
@@ -43,57 +44,39 @@ public abstract class Task<T> implements Serializable {
         this.priority = params.getPriority();
     }
 
-    public void run(){
 
-        TaskManager manager = TaskManager.DEFAULT;
-        if(manager != null){
-            manager.doTask(this);
-        }
-        else{
-            throw new IllegalStateException("DEFAULT static field in TaskManager class has to be set");
-        }
+    public void run() {
+
+        taskmanager.doTask(this);
+
+//        TaskManager manager = TaskManager.DEFAULT;
+//        if (manager != null) {
+//            manager.doTask(this);
+//        } else {
+//            throw new IllegalStateException("DEFAULT static field in TaskManager class has to be set");
+//        }
     }
 
-    public void run(int managerId){
+    public void cancel() {
 
-        if(managerId == 0){
-            run();
-        }
-        else{
-            TaskManager manager = TaskManager.instances.get(managerId);
-            if(manager == null){
-                throw new IllegalStateException("TaskManager with id " + managerId + "doesn't exists");
-            }
-            manager.doTask(this);
-        }
+        taskmanager.cancelRequest(this);
+
+//        TaskManager manager = TaskManager.DEFAULT;
+//        if (manager != null) {
+//            manager.cancelRequest(this);
+//        } else {
+//            throw new IllegalStateException("DEFAULT static field in TaskManager class has to be set");
+//        }
     }
 
-    public void cancel(){
-        TaskManager manager = TaskManager.DEFAULT;
-        if(manager != null){
-            manager.cancelRequest(this);
-        }
-        else{
-            throw new IllegalStateException("DEFAULT static field in TaskManager class has to be set");
-        }
+    protected abstract void doWork(CancelationToken cancelToken) throws Exception;
+
+    protected void recycle() {
     }
 
-    public void cancel(int managerId){
-        if(managerId == 0){
-            run();
-        }
-        else{
-            TaskManager manager = TaskManager.instances.get(managerId);
-            if(manager == null){
-                throw new IllegalStateException("TaskManager with id " + managerId + "doesn't exists");
-            }
-            manager.cancelRequest(this);
-        }
+    void setTaskmanager(TaskManager taskmanager) {
+        this.taskmanager = taskmanager;
     }
-
-    protected abstract void doWork(CancelationToken cancelToken)  throws Exception;
-
-    protected void recycle(){}
 
     public String getGroupId() {
         return groupId;
@@ -107,40 +90,38 @@ public abstract class Task<T> implements Serializable {
         return isUnique;
     }
 
-    @NonNull public String getId(){
+    @NonNull
+    public String getId() {
 
-        if(id == null){
+        if (id == null) {
             id = UUID.randomUUID().toString();
         }
 
         return id;
     }
 
-    public void setId(String uuid){
+    public void setId(String uuid) {
         id = uuid;
     }
 
-    boolean nextRetry(){
-        if(retryLimit > 0){
+    boolean nextRetry() {
+        if (retryLimit > 0) {
             retryLimit--;
             return true;
-        }
-        else if (retryLimit == -1){
+        } else if (retryLimit == -1) {
             return true;
-        }
-        else{
+        } else {
             return false;
         }
     }
 
-    public TaskStatus getTaskStatus(){
-        if(!isAttached){
+    public TaskStatus getTaskStatus() {
+        if (!isAttached) {
             TaskManager manager = TaskManager.DEFAULT;
-            if(manager != null){
+            if (manager != null) {
                 taskStatus = manager.checkExecutionStatus(this);
                 return taskStatus;
-            }
-            else {
+            } else {
                 return TaskStatus.NotExistsInQueue;
             }
         }
@@ -148,18 +129,17 @@ public abstract class Task<T> implements Serializable {
         return taskStatus;
     }
 
-    public TaskStatus getLastStatus(){
+    public TaskStatus getLastStatus() {
         return taskStatus;
     }
 
-    public TaskStatus getTaskStatus(int managerId){
-        if(!isAttached){
+    public TaskStatus getTaskStatus(int managerId) {
+        if (!isAttached) {
             TaskManager manager = TaskManager.getInstance(managerId);
-            if(manager != null){
+            if (manager != null) {
                 taskStatus = manager.checkExecutionStatus(this);
                 return taskStatus;
-            }
-            else {
+            } else {
                 return TaskStatus.NotExistsInQueue;
             }
         }
@@ -167,7 +147,7 @@ public abstract class Task<T> implements Serializable {
         return taskStatus;
     }
 
-    synchronized void setTaskStatus(TaskStatus status){
+    synchronized void setTaskStatus(TaskStatus status) {
         updateTime = System.currentTimeMillis();
         taskStatus = status;
     }
@@ -192,13 +172,13 @@ public abstract class Task<T> implements Serializable {
         this.manager = null;
     }
 
-    protected void notifyResult(TaskResult<T> data){
+    protected void notifyResult(TaskResult<T> data) {
         taskResult = data;
         manager.postResult(getId(), data);
         data.setTargetType(this.getClass());
     }
 
-    protected void notifyError(Throwable ex){
+    protected void notifyError(Throwable ex) {
         taskException = ex;
         manager.onError(getId(), ex);
     }
@@ -215,17 +195,17 @@ public abstract class Task<T> implements Serializable {
     @Override
     public boolean equals(Object otherObject) {
 
-        if(otherObject == null || !(otherObject instanceof Task) ){
+        if (otherObject == null || !(otherObject instanceof Task)) {
             return false;
         }
 
-        Task taskToCheckEquality = (Task)otherObject;
+        Task taskToCheckEquality = (Task) otherObject;
 
-        if(groupId != null) {
+        if (groupId != null) {
             return groupId.equals(taskToCheckEquality.groupId);
         }
 
-        if(isUnique){
+        if (isUnique) {
             String thisClassName = this.getClass().getCanonicalName();
             String requestClassName = taskToCheckEquality.getClass().getCanonicalName();
             return thisClassName.equals(requestClassName);

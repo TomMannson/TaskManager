@@ -51,6 +51,21 @@ public class TaskManager {
         }
     }
 
+    public <T extends Task> TaskBuilder<T> build(Class<T> clazz){
+        return new TaskBuilder(clazz).manager(this)
+    }
+
+//    public <T extends Task> T getOrCreate(String idOfTask, Class<T> clazz){
+//        Task task = service.findTaskById(idOfTask);
+//        if(task != null && task.getClass().equals(clazz)){
+//            return (T) task;
+//        }
+//        else {
+//            return (T) new TaskBuilder(clazz).manager(this).params(new TaskParams())
+//                    .build();
+//        }
+//    }
+
     public void start(Context context) {
         BootServiceMessage message = factory.obtain(BootServiceMessage.class);
         message.setAppContext(context);
