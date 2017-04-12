@@ -48,7 +48,7 @@ public class SqlSerializer implements Serializer {
 
         value.put(TaskDbContract.TaskTable.MANAGER_ID, "" + managerId);
 
-        if (taskToPersist.getTaskStatus() == TaskStatus.NotExistsInQueue) {
+        if (taskToPersist.getState().getStatus() == TaskStatus.NotExistsInQueue) {
             createTaskInDB(db, value);
         } else {
             int data = editTaskInDB(taskToPersist, db, value);

@@ -1,5 +1,7 @@
 package pl.tommmannson.taskqueue;
 
+import pl.tommmannson.taskqueue.persistence.RetryControler;
+
 /**
  * Created by tomasz.krol on 2016-05-06.
  */
@@ -10,6 +12,7 @@ public class TaskParams {
     private boolean persistent = false;
     private int retryLimit = 0;
     private int priority = 0;
+    private int retryStrategy = RetryControler.RETRY_STRATEGY_NONE;
 
 
     public boolean isUnique() {
@@ -32,6 +35,10 @@ public class TaskParams {
         return priority;
     }
 
+    public int getRetryStrategy() {
+        return retryStrategy;
+    }
+
     public TaskParams unique(boolean unique) {
         isUnique = unique;
         return this;
@@ -52,8 +59,15 @@ public class TaskParams {
         return this;
     }
 
+    public TaskParams retryStrategy(int retryStrategy) {
+        this.retryStrategy = retryStrategy;
+        return this;
+    }
+
     public TaskParams priority(int priority) {
         this.priority = priority;
         return this;
     }
+
+
 }

@@ -15,9 +15,9 @@ public interface TaskManagementInterface {
 
     void cancelAll();
 
-    <T> void registerCallbackForRequest(Task<T> request, TaskCallback callback);
+    <T> void registerCallbackForRequest(String requestId, TaskCallback callback);
 
-    <T> void unregisterCallbackForRequest(Task<T> request, TaskCallback callback);
+    <T> void unregisterCallbackForRequest(String requestId, TaskCallback callback);
 
     Task findTaskById(String id);
 

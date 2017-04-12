@@ -4,10 +4,10 @@ package pl.tommmannson.taskqueue;
 import android.support.annotation.NonNull;
 
 import java.io.Serializable;
-import java.util.UUID;
 
 import pl.tommmannson.taskqueue.cancelation.CancelationToken;
 import pl.tommmannson.taskqueue.persistence.RetryControler;
+import pl.tommmannson.taskqueue.persistence.TaskState;
 import pl.tommmannson.taskqueue.persistence.TaskStatus;
 import pl.tommmannson.taskqueue.progress.ProgressManager;
 
@@ -25,10 +25,7 @@ public abstract class Task<T> implements Serializable {
     RetryControler retry;
     private int priority = 0;
 
-    private TaskResult<T> taskResult;
-    private Throwable taskException;
-    private TaskStatus taskStatus = TaskStatus.NotExistsInQueue;
-
+    TaskState state = new TaskState();
 
     transient private TaskManager taskmanager;
     transient private ProgressManager<T> manager;
@@ -43,7 +40,8 @@ public abstract class Task<T> implements Serializable {
             params = new TaskParams();
         }
         this.persistent = params.isPersistent();
-        this.retry = new RetryControler(params.getRetryLimit());
+        this.retry =
+                new RetryControler(params.getRetryLimit(), params.getRetryStrategy());
         this.groupId = params.getGroupId();
         this.priority = params.getPriority();
     }
@@ -69,32 +67,32 @@ public abstract class Task<T> implements Serializable {
         id = uuid;
     }
 
-    public TaskStatus getLastStatus() {
-        return taskStatus;
+    public TaskState getState() {
+        return state;
     }
 
-    public TaskStatus getTaskStatus() {
-        return taskStatus;
-    }
-
-    synchronized void setTaskStatus(TaskStatus status) {
+    synchronized void setExecutionStatus(TaskStatus status) {
+        state.setStatus(status);
         updateTime = System.currentTimeMillis();
-        taskStatus = status;
     }
 
     protected void notifyResult(TaskResult<T> data) {
-        taskResult = data;
-        manager.postResult(getId(), data);
+        state.setResult(data);//taskResult = data;
+        manager.postResult(this);
         data.setTargetType(this.getClass());
     }
 
     protected void notifyError(Throwable ex) {
-        taskException = ex;
-        manager.onError(getId(), ex);
+        state.setException((Exception) ex);
+        manager.onError(this);
     }
 
     boolean nextRetry() {
         return retry.nextRetry();
+    }
+
+    public RetryControler getRetryState(){
+        return retry;
     }
 
     void setTaskmanager(TaskManager taskmanager) {
@@ -108,10 +106,6 @@ public abstract class Task<T> implements Serializable {
 
     void detachProgressManager() {
         this.manager = null;
-    }
-
-    public T getTaskResult(TaskResult<T> resultData) {
-        return resultData.getResultData();
     }
 
     public int getPriority() {
@@ -149,6 +143,6 @@ public abstract class Task<T> implements Serializable {
 
     @Override
     public String toString() {
-        return String.format("Task %s, lastStatus %s", this.getClass().getSimpleName(), this.taskStatus.toString());
+        return String.format("Task %s, lastStatus %s", this.getClass().getSimpleName(), this.state.getStatus().toString());
     }
 }

@@ -5,9 +5,7 @@ import android.content.Context;
 import android.content.ServiceConnection;
 import android.os.IBinder;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import pl.tommmannson.taskqueue.bootstraping.TaskManagementInterface;
@@ -19,7 +17,6 @@ import pl.tommmannson.taskqueue.messaging.impl.BootServiceMessage;
 import pl.tommmannson.taskqueue.messaging.impl.CancelTaskMessage;
 import pl.tommmannson.taskqueue.messaging.impl.RegisterCallbackMessage;
 import pl.tommmannson.taskqueue.messaging.impl.UnregisterCallbackMessage;
-import pl.tommmannson.taskqueue.persistence.TaskStatus;
 import pl.tommmannson.taskqueue.progress.OnManagerReadyListener;
 import pl.tommmannson.taskqueue.progress.QueueReadyNotifer;
 import pl.tommmannson.taskqueue.progress.TaskCallback;
@@ -84,25 +81,25 @@ public class TaskManager {
         messageDispatcher.dispatch(message);
     }
 
-    public <T> void registerCallback(final Task<T> task, final TaskCallback callback) {
+    public <T> void registerCallback(String taskId, final TaskCallback callback) {
 
-        if (task == null || callback == null)
+        if (taskId == null || callback == null)
             return;
 
         RegisterCallbackMessage message = factory.obtain(RegisterCallbackMessage.class);
-        message.setTask(task);
+        message.setTaskId(taskId);
         message.setTaskCallback(callback);
         message.setTaskManager(this);
         messageDispatcher.dispatch(message);
     }
 
-    public <T> void unregisterCallback(final Task<T> task, final TaskCallback callback) {
+    public <T> void unregisterCallback(String taskId, final TaskCallback callback) {
 
-        if (task == null || callback == null)
+        if (taskId == null || callback == null)
             return;
 
         UnregisterCallbackMessage message = factory.obtain(UnregisterCallbackMessage.class);
-        message.setTask(task);
+        message.setTaskId(taskId);
         message.setTaskCallback(callback);
         message.setTaskManager(this);
         messageDispatcher.dispatch(message);

@@ -4,21 +4,19 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
 import pl.tommmannson.taskqueue.TaskManager;
-import pl.tommmannson.taskqueue.TaskResult;
+import pl.tommmannson.taskqueue.TaskParams;
+import pl.tommmannson.taskqueue.persistence.TaskState;
 import pl.tommmannson.taskqueue.progress.OnManagerReadyListener;
 import pl.tommmannson.taskqueue.progress.TaskCallback;
 
 public class MainActivity extends AppCompatActivity implements TaskCallback, OnManagerReadyListener {
 
     final static String downloadItemsRequest = "downloadItemsRequest";
-    SampleTask task = null;//new SampleTask();
-    SampleTask2 task2 = new SampleTask2();
+    SampleTask task = null;
     TaskManager manager;
 
     @Override
@@ -35,12 +33,8 @@ public class MainActivity extends AppCompatActivity implements TaskCallback, OnM
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
 
                 task.run();
-
-
             }
         });
     }
@@ -48,48 +42,24 @@ public class MainActivity extends AppCompatActivity implements TaskCallback, OnM
     @Override
     protected void onResume() {
         super.onResume();
-        manager.registerCallback(task, this);
-//        manager.registerCallback(task2, this);
+        manager.registerCallback(downloadItemsRequest, this);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        manager.unregisterCallback(task, this);
-//        manager.unregisterCallback(task2, this);
+        manager.unregisterCallback(downloadItemsRequest, this);
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onResult(String id, TaskResult result) {
+    public void onResult(String id, TaskState result) {
         switch (id) {
             case downloadItemsRequest: {
-                task.getTaskResult(result);//result.getResultData(Void.class);
+                Integer data = result.getResult().getResultData();
                 Toast.makeText(this, "finished", Toast.LENGTH_SHORT).show();
                 break;
             }
-            default:{
+            default: {
                 Toast.makeText(this, "secondTask", Toast.LENGTH_SHORT).show();
             }
         }
@@ -100,18 +70,11 @@ public class MainActivity extends AppCompatActivity implements TaskCallback, OnM
 
     }
 
-//    @Override
-//    public void onTaskLoaded(Map<String, Task> result) {
-//        MainActivity.this.task = (SampleTask) task;
-//        if(task == null){
-//            this.task = new SampleTask();
-//            this.task.setId(downloadItemsRequest);
-//        }
-//        manager.registerCallback(task, MainActivity.this);
-//    }
-
     @Override
     public void onTaskManagerReady(long id) {
-        task = manager.build(SampleTask.class).id(downloadItemsRequest).getOrCreate();
+        task = manager.build(SampleTask.class)
+                .id(downloadItemsRequest)
+                .params(new TaskParams().retryLimit(10).retryStrategy(2))
+                .getOrCreate();
     }
 }

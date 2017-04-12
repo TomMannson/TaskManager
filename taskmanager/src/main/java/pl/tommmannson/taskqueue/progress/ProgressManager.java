@@ -8,6 +8,7 @@ import java.util.List;
 
 import pl.tommmannson.taskqueue.Task;
 import pl.tommmannson.taskqueue.TaskResult;
+import pl.tommmannson.taskqueue.persistence.TaskState;
 
 /**
  * Created by tomasz.krol on 2016-01-29.
@@ -21,14 +22,14 @@ public class ProgressManager<T> {
         this.callbacks = callback;
     }
 
-    public void postResult(final String id, final TaskResult<T> data) {
+    public void postResult(final Task task) {
         if (callbacks != null) {
             for (final TaskCallback callback : callbacks) {
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
                         Log.d("ProgressManager", "postResult "+callback.getClass().getSimpleName());
-                        callback.onResult(id, data);
+                        callback.onResult(task.getId(), task.getState());
                     }
                 });
             }
@@ -49,19 +50,21 @@ public class ProgressManager<T> {
 //        }
 //    }
 
-    public void onError(final String id, final Throwable ex) {
+    public void onError(final Task task) {
         if (callbacks != null) {
             for (final TaskCallback callback : callbacks) {
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
                         Log.d("ProgressManager", "onError "+callback.getClass().getSimpleName());
-                        callback.onError(id, ex);
+                        callback.onError(task.getId(), task.getState().getException());
                     }
                 });
             }
         }
     }
+
+
 
 
 }

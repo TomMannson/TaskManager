@@ -16,6 +16,7 @@ import pl.tommmannson.taskqueue.cancelation.CancelationException;
 import pl.tommmannson.taskqueue.cancelation.CancelationToken;
 import pl.tommmannson.taskqueue.config.TaskManagerConfiguration;
 import pl.tommmannson.taskqueue.di.DependencyInjector;
+import pl.tommmannson.taskqueue.persistence.RetryOperation;
 import pl.tommmannson.taskqueue.persistence.Serializer;
 import pl.tommmannson.taskqueue.persistence.TaskStatus;
 import pl.tommmannson.taskqueue.persistence.serialization.FileSerializer;
@@ -72,7 +73,6 @@ public class TaskQueueThread implements Bootable, TaskManagementInterface {
 
         if (concurrentTaskQueue.hasTasksWaitingForExecution()) {
             Task request = null;
-//            manager = null;
             try {
 
                 request = concurrentTaskQueue.getTaskFromQueue();
@@ -87,19 +87,17 @@ public class TaskQueueThread implements Bootable, TaskManagementInterface {
 
             } catch (InterruptedException ex) {
                 concurrentTaskQueue.moveFromExecutingToWaiting(request);
-                serializer.persist(concurrentTaskQueue, request);
             } catch (CancelationException ex) {
                 Log.d(this.getClass().getName(), String.format("%s canceled", request));
 
                 ProgressManager manager = ProgressManagerFactory.create(request.getId(), callbacks);
-                manager.postResult(request.getId(), TaskResult.cancelResult( null));
+                manager.postResult(request);
 
                 if (request != null) {
                     cancelation.remove(request);
                     concurrentTaskQueue.removeProcessing(request);
-                    request.setTaskStatus(TaskStatus.Canceled);
+                    request.setExecutionStatus(TaskStatus.Canceled);
                 }
-                serializer.persist(concurrentTaskQueue, request);
             } catch (Exception ex) {
 
                 Log.e("TaskService", "Exception during request process on  ");
@@ -107,13 +105,19 @@ public class TaskQueueThread implements Bootable, TaskManagementInterface {
 
                 if (request != null) {
                     if (request.nextRetry()) {
-                        concurrentTaskQueue.moveFromExecutingToWaiting(request);
+                        //concurrentTaskQueue.moveFromExecutingToWaiting(request);
+                        concurrentTaskQueue.moveToPending(request, new RetryOperation() {
+                            @Override
+                            public void doOnRetry() {
+                                workerThreadPool.execute(TaskQueueThread.this);
+                            }
+                        });
                         workerThreadPool.execute(this);
                     } else {
                         concurrentTaskQueue.removeProcessing(request);
                     }
 
-                    request.setTaskStatus(TaskStatus.FailFinished);
+                    request.setExecutionStatus(TaskStatus.FailFinished);
                     request.recycle();
 
                 }
@@ -133,23 +137,26 @@ public class TaskQueueThread implements Bootable, TaskManagementInterface {
         cancelation.put(request, token);
         ProgressManager manager = ProgressManagerFactory.create(request.getId(), callbacks);
 
-        request.setTaskStatus(TaskStatus.InProgress);
+        request.setExecutionStatus(TaskStatus.InProgress);
 
         if (injector != null) {
             injector.inject(request);
         }
         request.attachProgressManager(manager);
         request.doWork(token);
+        if(request.getState().getException() != null){
+            throw request.getState().getException();
+        }
         cancelation.remove(request);
 
-        request.setTaskStatus(TaskStatus.SuccessfullyFinished);
+        request.setExecutionStatus(TaskStatus.SuccessfullyFinished);
     }
 
     public void addRequest(Task<?> task) {
 
         if (concurrentTaskQueue.pushToQueue(task)) {
             tasks.put(task.getId(), task);
-            task.setTaskStatus(TaskStatus.AddedToQueue);
+            task.setExecutionStatus(TaskStatus.AddedToQueue);
             serializer.persist(concurrentTaskQueue, task);
 
             if (workerThreadPool.getActiveCount() < workerThreadCount) {
@@ -161,7 +168,7 @@ public class TaskQueueThread implements Bootable, TaskManagementInterface {
     public void cancelRequest(Task<?> request) {
 
         if (concurrentTaskQueue.removeWaiting(request)) {
-            request.setTaskStatus(TaskStatus.Canceled);
+            request.setExecutionStatus(TaskStatus.Canceled);
         }
         CancelationToken token = cancelation.get(request);
         if (token != null) {
@@ -173,21 +180,21 @@ public class TaskQueueThread implements Bootable, TaskManagementInterface {
 
         for (Map.Entry<Task<?>, CancelationToken> entry : cancelation.entrySet()) {
             entry.getValue().cancel();
-            entry.getKey().setTaskStatus(TaskStatus.Canceled);
+            entry.getKey().setExecutionStatus(TaskStatus.Canceled);
         }
 
 //        callbacks.clear();
         concurrentTaskQueue.clear();
     }
 
-    public <T> void registerCallbackForRequest(Task<T> request, TaskCallback callback) {
+    public <T> void registerCallbackForRequest(String requestId, TaskCallback callback) {
         if (callback != null) {
             List<TaskCallback> callbacksList = null;
-            if (callbacks.containsKey(request)) {
-                callbacksList = callbacks.get(request);
+            if (callbacks.containsKey(requestId)) {
+                callbacksList = callbacks.get(requestId);
             } else {
                 callbacksList = new ArrayList<>(1);
-                callbacks.put(request.getId(), callbacksList);
+                callbacks.put(requestId, callbacksList);
             }
             if (!callbacksList.contains(callback)) {
                 callbacksList.add(callback);
@@ -195,8 +202,8 @@ public class TaskQueueThread implements Bootable, TaskManagementInterface {
         }
     }
 
-    public <T> void unregisterCallbackForRequest(Task<T> request, TaskCallback callback) {
-        List<TaskCallback> listOfcallback = callbacks.get(request.getId());
+    public <T> void unregisterCallbackForRequest(String requestId, TaskCallback callback) {
+        List<TaskCallback> listOfcallback = callbacks.get(requestId);
         if (listOfcallback != null) {
             listOfcallback.remove(callback);
         }

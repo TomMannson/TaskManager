@@ -2,8 +2,10 @@ package pl.tommmannson.taskqueue.queues;
 
 
 import java.util.List;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import pl.tommmannson.taskqueue.Task;
+import pl.tommmannson.taskqueue.persistence.RetryOperation;
 
 /**
  * Created by tomasz.krol on 2016-10-24.
@@ -28,4 +30,6 @@ public interface TaskQueue {
     List<Task<?>> getFullList();
 
     void addFullList(List<Task<?>> listToAdd);
+
+    void moveToPending(Task request, final RetryOperation operation);
 }

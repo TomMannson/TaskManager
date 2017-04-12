@@ -86,15 +86,15 @@ public class TaskService extends Service implements TaskManagementInterface{
     }
 
     @Override
-    public <T> void registerCallbackForRequest(Task<T> request, TaskCallback callback) {
+    public <T> void registerCallbackForRequest(String taskId, TaskCallback callback) {
 
-        taskQueueThread.registerCallbackForRequest(request, callback);
+        taskQueueThread.registerCallbackForRequest(taskId, callback);
     }
 
     @Override
-    public <T> void unregisterCallbackForRequest(Task<T> request, TaskCallback callback) {
+    public <T> void unregisterCallbackForRequest(String taskId, TaskCallback callback) {
 
-        taskQueueThread.unregisterCallbackForRequest(request, callback);
+        taskQueueThread.unregisterCallbackForRequest(taskId, callback);
     }
 
     @Override

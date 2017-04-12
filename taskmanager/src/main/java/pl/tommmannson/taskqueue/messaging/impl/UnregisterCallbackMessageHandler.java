@@ -15,6 +15,6 @@ public class UnregisterCallbackMessageHandler implements MessageHandler<Unregist
 
         TaskQueueReadyChecker.waitForreadyQueue(message.getTaskManager());
         message.getTaskManager().getService()
-                .unregisterCallbackForRequest(message.getTask(), message.getTaskCallback());
+                .unregisterCallbackForRequest(message.getTaskId(), message.getTaskCallback());
     }
 }

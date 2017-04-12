@@ -1,6 +1,5 @@
 package pl.tommmannson.taskqueue.messaging.impl;
 
-import pl.tommmannson.taskqueue.bootstraping.TaskManagementInterface;
 import pl.tommmannson.taskqueue.messaging.MessageHandler;
 import pl.tommmannson.taskqueue.utils.TaskQueueReadyChecker;
 
@@ -15,7 +14,7 @@ public class RegisterCallbackMessageHandler implements MessageHandler<RegisterCa
 
         TaskQueueReadyChecker.waitForreadyQueue(message.getTaskManager());
 
-        message.getTaskManager().getService().registerCallbackForRequest(message.getTask(), message.getTaskCallback());
+        message.getTaskManager().getService().registerCallbackForRequest(message.getTaskId(), message.getTaskCallback());
 
     }
 }

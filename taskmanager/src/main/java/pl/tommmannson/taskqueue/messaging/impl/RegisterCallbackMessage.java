@@ -15,15 +15,15 @@ public class RegisterCallbackMessage extends AbsMessage {
         super(3);
     }
 
-    Task task;
+    String taskId;
     TaskCallback taskCallback;
 
-    public Task getTask() {
-        return task;
+    public String getTaskId() {
+        return taskId;
     }
 
-    public void setTask(Task task) {
-        this.task = task;
+    public void setTaskId(String taskId) {
+        this.taskId = taskId;
     }
 
     public TaskCallback getTaskCallback() {

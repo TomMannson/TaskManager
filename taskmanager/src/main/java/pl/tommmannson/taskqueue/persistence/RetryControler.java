@@ -11,20 +11,32 @@ public class RetryControler implements Serializable {
     private static final int RETRY_STOP = 0;
     private static final int RETRY_INFINITY = -1;
 
-    private int retryLimit = 0;
+    public static final int RETRY_STRATEGY_NONE = 0;
+    public static final int RETRY_STRATEGY_LINEAR = 1;
+    public static final int RETRY_STRATEGY_EXP = 2;
 
-    public RetryControler(int retryLimit) {
+    private int retryLimit = 0;
+    private int retryStrategy = 0;
+    private int retryTime = 100;
+
+    public RetryControler(int retryLimit, int retryStrategy) {
         this.retryLimit = retryLimit;
+        this.retryStrategy = retryStrategy;
     }
 
     public boolean nextRetry() {
         if (retryLimit > RETRY_STOP) {
             retryLimit--;
+            retryTime *= 2;
             return true;
         } else if (retryLimit == RETRY_INFINITY) {
             return true;
         } else {
             return false;
         }
+    }
+
+    public long retryDelay(){
+        return retryTime;
     }
 }
