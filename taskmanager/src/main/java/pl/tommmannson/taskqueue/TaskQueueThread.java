@@ -15,7 +15,7 @@ import pl.tommmannson.taskqueue.bootstraping.TaskManagementInterface;
 import pl.tommmannson.taskqueue.cancelation.CancelationException;
 import pl.tommmannson.taskqueue.cancelation.CancelationToken;
 import pl.tommmannson.taskqueue.config.TaskManagerConfiguration;
-import pl.tommmannson.taskqueue.di.DependencyInjector;
+import pl.tommmannson.taskqueue.config.di.DependencyInjector;
 import pl.tommmannson.taskqueue.persistence.RetryOperation;
 import pl.tommmannson.taskqueue.persistence.Serializer;
 import pl.tommmannson.taskqueue.persistence.TaskStatus;

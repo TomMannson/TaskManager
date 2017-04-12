@@ -1,4 +1,4 @@
-package pl.tommmannson.taskqueue.di;
+package pl.tommmannson.taskqueue.config.di;
 
 
 import pl.tommmannson.taskqueue.Task;

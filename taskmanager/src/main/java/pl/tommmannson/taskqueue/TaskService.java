@@ -2,26 +2,14 @@ package pl.tommmannson.taskqueue;
 
 import android.app.Service;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.os.Binder;
 import android.os.IBinder;
 
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ThreadPoolExecutor;
-
 import pl.tommmannson.taskqueue.bootstraping.Bootstraper;
 import pl.tommmannson.taskqueue.bootstraping.TaskManagementInterface;
-import pl.tommmannson.taskqueue.cancelation.CancelationToken;
 import pl.tommmannson.taskqueue.config.TaskManagerConfiguration;
-import pl.tommmannson.taskqueue.di.DependencyInjector;
-import pl.tommmannson.taskqueue.persistence.Serializer;
-import pl.tommmannson.taskqueue.persistence.TaskStatus;
-import pl.tommmannson.taskqueue.persistence.sqlite.SqlSerializer;
 import pl.tommmannson.taskqueue.progress.TaskCallback;
-import pl.tommmannson.taskqueue.queues.TaskQueue;
 
 
 public class TaskService extends Service implements TaskManagementInterface{

@@ -7,11 +7,9 @@ import android.support.annotation.IntDef;
 import java.lang.annotation.Retention;
 
 import pl.tommmannson.taskqueue.TaskService;
-import pl.tommmannson.taskqueue.di.DependencyInjector;
+import pl.tommmannson.taskqueue.config.di.DependencyInjector;
 
 import static java.lang.annotation.RetentionPolicy.SOURCE;
-import static pl.tommmannson.taskqueue.config.TaskManagerConfiguration.FILE_SERIALIZABLE;
-import static pl.tommmannson.taskqueue.config.TaskManagerConfiguration.SQLITE_SERIALIZABLE;
 
 /**
  * Created by tomasz.krol on 2016-05-06.
