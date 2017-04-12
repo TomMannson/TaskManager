@@ -148,7 +148,6 @@ public class TaskQueueThread implements Bootable, TaskManagementInterface {
     public void addRequest(Task<?> task) {
 
         if (concurrentTaskQueue.pushToQueue(task)) {
-            task.setIsAttached();
             tasks.put(task.getId(), task);
             task.setTaskStatus(TaskStatus.AddedToQueue);
             serializer.persist(concurrentTaskQueue, task);
@@ -203,18 +202,6 @@ public class TaskQueueThread implements Bootable, TaskManagementInterface {
         }
     }
 
-    public <T> TaskStatus getTaskStatus(Task<T> request) {
-
-        Task taskCached = tasks.get(request.getId());
-        if (taskCached == null) {
-            tasks.put(request.getId(), request);
-            return TaskStatus.NotExistsInQueue;
-        } else {
-            taskCached.setIsAttached();
-        }
-        return taskCached.getTaskStatus();
-    }
-
     public Task findTaskById(String id) {
         return tasks.get(id);
     }
@@ -222,6 +209,11 @@ public class TaskQueueThread implements Bootable, TaskManagementInterface {
 
     public synchronized boolean tasksLoaded() {
         return this.tasksLoadedFlag;
+    }
+
+    @Override
+    public void addTaskToTracking(Task task) {
+        tasks.put(task.getId(), task);
     }
 
     @Override

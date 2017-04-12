@@ -98,12 +98,6 @@ public class TaskService extends Service implements TaskManagementInterface{
     }
 
     @Override
-    public <T> TaskStatus getTaskStatus(Task<T> request) {
-
-        return taskQueueThread.getTaskStatus(request);
-    }
-
-    @Override
     public Task findTaskById(String id) {
         return taskQueueThread.findTaskById(id);
     }
@@ -115,6 +109,11 @@ public class TaskService extends Service implements TaskManagementInterface{
 
     public synchronized boolean tasksLoaded() {
         return taskQueueThread.tasksLoaded();
+    }
+
+    @Override
+    public void addTaskToTracking(Task task) {
+        taskQueueThread.addTaskToTracking(task);
     }
 
     public static class RequestBinder extends Binder {

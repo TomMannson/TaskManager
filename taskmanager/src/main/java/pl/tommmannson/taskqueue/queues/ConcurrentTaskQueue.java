@@ -49,7 +49,7 @@ public class ConcurrentTaskQueue implements TaskQueue {
     public synchronized Task getTaskFromQueue( ) throws InterruptedException {
         Task task = workQueue.peek();
 
-        if (task.isUnique() || task.getGroupId() != null) {
+        if (task.getGroupId() != null) {
             uniqueTasks.add(task);
         }
 

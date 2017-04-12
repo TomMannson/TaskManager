@@ -9,15 +9,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
-import java.util.Map;
-
-import pl.tommmannson.taskqueue.Task;
-import pl.tommmannson.taskqueue.TaskQuery;
 import pl.tommmannson.taskqueue.TaskManager;
 import pl.tommmannson.taskqueue.TaskResult;
+import pl.tommmannson.taskqueue.progress.OnManagerReadyListener;
 import pl.tommmannson.taskqueue.progress.TaskCallback;
 
-public class MainActivity extends AppCompatActivity implements TaskCallback, TaskQuery.TaskContainerCallback {
+public class MainActivity extends AppCompatActivity implements TaskCallback, OnManagerReadyListener {
 
     final static String downloadItemsRequest = "downloadItemsRequest";
     SampleTask task = null;//new SampleTask();
@@ -29,23 +26,10 @@ public class MainActivity extends AppCompatActivity implements TaskCallback, Tas
         super.onCreate(savedInstanceState);
         manager = TaskManager.getInstance(1);
 
-        SampleTask task = manager.getOrCreate(downloadItemsRequest, SampleTask.class);
+        manager.registerMessageQueueReady(this);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-//        task = new SampleTask();
-//        task.setId(downloadItemsRequest);
-//        task2.setId("secondTask");
-
-//        TaskQuery<SampleTask> taskcontainer = manager.findTaskById(downloadItemsRequest);
-//        if (taskcontainer.isReady()) {
-//            task = taskcontainer.getTask();
-//            manager.registerCallback(task, MainActivity.this);
-//        } else {
-//            taskcontainer.executeAsync(this);
-//        }
-
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -54,8 +38,7 @@ public class MainActivity extends AppCompatActivity implements TaskCallback, Tas
 //                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
 //                        .setAction("Action", null).show();
 
-                new SampleTask().run(1);
-//                App.JOB_MANAGER.addJobInBackground(new SampleJob(new Params(1)));
+                task.run();
 
 
             }
@@ -65,14 +48,14 @@ public class MainActivity extends AppCompatActivity implements TaskCallback, Tas
     @Override
     protected void onResume() {
         super.onResume();
-//        manager.registerCallback(task, this);
+        manager.registerCallback(task, this);
 //        manager.registerCallback(task2, this);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-//        manager.unregisterCallback(task, this);
+        manager.unregisterCallback(task, this);
 //        manager.unregisterCallback(task2, this);
     }
 
@@ -117,13 +100,18 @@ public class MainActivity extends AppCompatActivity implements TaskCallback, Tas
 
     }
 
+//    @Override
+//    public void onTaskLoaded(Map<String, Task> result) {
+//        MainActivity.this.task = (SampleTask) task;
+//        if(task == null){
+//            this.task = new SampleTask();
+//            this.task.setId(downloadItemsRequest);
+//        }
+//        manager.registerCallback(task, MainActivity.this);
+//    }
+
     @Override
-    public void onTaskLoaded(Map<String, Task> result) {
-        MainActivity.this.task = (SampleTask) task;
-        if(task == null){
-            this.task = new SampleTask();
-            this.task.setId(downloadItemsRequest);
-        }
-        manager.registerCallback(task, MainActivity.this);
+    public void onTaskManagerReady(long id) {
+        task = manager.build(SampleTask.class).id(downloadItemsRequest).getOrCreate();
     }
 }

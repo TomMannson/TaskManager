@@ -13,7 +13,7 @@ import pl.tommmannson.taskqueue.cancelation.CancelationToken;
  */
 
 public class SampleTask extends Task<Void> {
-    protected SampleTask() {
+    public SampleTask(TaskParams params) {
         super(new TaskParams().persistent(true).unique(true));
     }
 
@@ -22,8 +22,8 @@ public class SampleTask extends Task<Void> {
         Log.e(SampleTask.class.getSimpleName(), "finished");
         Thread.sleep(2000);
         notifyResult(TaskResult.<Void>progressResult(null));
-        SampleTask2 task2 = new SampleTask2();
-        task2.setId("secondTask");
-        task2.run(1);
+//        SampleTask2 task2 = new SampleTask2();
+//        task2.setId("secondTask");
+//        task2.run(1);
     }
 }

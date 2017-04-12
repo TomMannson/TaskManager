@@ -37,7 +37,6 @@ public class App extends Application {
 //                .build());
 //        taskManager.start(getApplicationContext());
 
-        TaskManager taskManager2 = TaskManager.createInstance(1, new DefaultTaskManagerConfiguration(this));
-        taskManager2.start(getApplicationContext());
+        TaskManager.createInstance(1, new DefaultTaskManagerConfiguration(this));
     }
 }

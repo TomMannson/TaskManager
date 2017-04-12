@@ -20,6 +20,8 @@ import pl.tommmannson.taskqueue.messaging.impl.CancelTaskMessage;
 import pl.tommmannson.taskqueue.messaging.impl.RegisterCallbackMessage;
 import pl.tommmannson.taskqueue.messaging.impl.UnregisterCallbackMessage;
 import pl.tommmannson.taskqueue.persistence.TaskStatus;
+import pl.tommmannson.taskqueue.progress.OnManagerReadyListener;
+import pl.tommmannson.taskqueue.progress.QueueReadyNotifer;
 import pl.tommmannson.taskqueue.progress.TaskCallback;
 
 /**
@@ -35,7 +37,7 @@ public class TaskManager {
     TaskManagementInterface service;
     MessageDispather messageDispatcher;
     MessageFactory factory = new MessageFactory();
-    List<Task> statusToUpdate = new ArrayList<>();
+    QueueReadyNotifer notifier = new QueueReadyNotifer(this);
     private int id;
 
     public TaskManager(TaskManagerConfiguration config) {
@@ -51,20 +53,17 @@ public class TaskManager {
         }
     }
 
-    public <T extends Task> TaskBuilder<T> build(Class<T> clazz){
-        return new TaskBuilder(clazz).manager(this)
+    public void registerMessageQueueReady(OnManagerReadyListener listener) {
+        notifier.addListener(listener);
     }
 
-//    public <T extends Task> T getOrCreate(String idOfTask, Class<T> clazz){
-//        Task task = service.findTaskById(idOfTask);
-//        if(task != null && task.getClass().equals(clazz)){
-//            return (T) task;
-//        }
-//        else {
-//            return (T) new TaskBuilder(clazz).manager(this).params(new TaskParams())
-//                    .build();
-//        }
-//    }
+    public void unregisterMessageQueueReady(OnManagerReadyListener listener) {
+        notifier.removeListener(listener);
+    }
+
+    public <T extends Task> TaskBuilder<T> build(Class<T> clazz) {
+        return (TaskBuilder<T>) new TaskBuilder<T>(clazz).manager(this);
+    }
 
     public void start(Context context) {
         BootServiceMessage message = factory.obtain(BootServiceMessage.class);
@@ -126,35 +125,14 @@ public class TaskManager {
         }
     }
 
-    public <T> TaskStatus checkExecutionStatus(final Task<T> request) {
-        if (service == null) {
-            statusToUpdate.add(request);
-            return TaskStatus.NotExistsInQueue;
-        } else {
-            return service.getTaskStatus(request);
-        }
-    }
-
-    public TaskQuery findTaskById(String id) {
-        TaskQuery container = new TaskQuery();
-        container.setIdForQuery(new String[]{id});
-        container.setManager(this);
-        return container;
-    }
-
-    public TaskQuery findTaskById(String[] ids) {
-        TaskQuery container = new TaskQuery();
-        container.setIdForQuery(ids);
-        container.setManager(this);
-        return container;
-    }
-
     public TaskManagementInterface getService() {
         return service;
     }
 
-    public void setService(TaskQueueThread service) {
+    public void setService(TaskManagementInterface service) {
         this.service = service;
+        if (service != null)
+            notifier.notifyListeners();
     }
 
     void setId(int id) {
@@ -163,6 +141,10 @@ public class TaskManager {
 
     public int getId() {
         return id;
+    }
+
+    public void addTask(Task task) {
+        service.addTaskToTracking(task);
     }
 
     public class RequestServiceConnection implements ServiceConnection {
@@ -178,16 +160,13 @@ public class TaskManager {
                 bindedService.setQueueId(id);
                 bindedService.start();
 
-                TaskManager.this.service = bindedService;
-                for (Task task : statusToUpdate) {
-                    checkExecutionStatus(task);
-                }
+                setService(bindedService);
             }
         }
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
-
+            setService(null);
         }
     }
 

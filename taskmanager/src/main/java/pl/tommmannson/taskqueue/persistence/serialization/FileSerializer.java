@@ -8,6 +8,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 import pl.tommmannson.taskqueue.Task;
@@ -32,7 +33,13 @@ public class FileSerializer implements Serializer {
             FileOutputStream fileOut =
                     new FileOutputStream(new File(pathToHoldSavedTasks));
             ObjectOutputStream out = new ObjectOutputStream(fileOut);
-            out.writeObject(queue.getFullList());
+            List<Task<?>> listToWrite = new ArrayList<>();
+            for (Task<?> task: queue.getFullList()) {
+                if(task.isPersistent()) {
+                    listToWrite.add(task);
+                }
+            }
+            out.writeObject(listToWrite);
             out.close();
 
         } catch (IOException ex) {
@@ -52,10 +59,5 @@ public class FileSerializer implements Serializer {
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
-//        new Thread() {
-////            public void run() {
-//
-//            }
-//        }.start();
     }
 }

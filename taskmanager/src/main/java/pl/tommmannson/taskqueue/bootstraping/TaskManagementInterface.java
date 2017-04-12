@@ -19,8 +19,6 @@ public interface TaskManagementInterface {
 
     <T> void unregisterCallbackForRequest(Task<T> request, TaskCallback callback);
 
-    <T> TaskStatus getTaskStatus(Task<T> request);
-
     Task findTaskById(String id);
 
     void configure(TaskManagerConfiguration configuration);
@@ -29,5 +27,5 @@ public interface TaskManagementInterface {
 
     void setQueueId(int queueId);
 
-    boolean tasksLoaded();
+    void addTaskToTracking(Task task);
 }

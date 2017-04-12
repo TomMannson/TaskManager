@@ -7,6 +7,7 @@ import java.io.Serializable;
 import java.util.UUID;
 
 import pl.tommmannson.taskqueue.cancelation.CancelationToken;
+import pl.tommmannson.taskqueue.persistence.RetryControler;
 import pl.tommmannson.taskqueue.persistence.TaskStatus;
 import pl.tommmannson.taskqueue.progress.ProgressManager;
 
@@ -16,87 +17,51 @@ import pl.tommmannson.taskqueue.progress.ProgressManager;
  */
 public abstract class Task<T> implements Serializable {
 
-    private TaskManager taskmanager;
+
     private String id;
     private long updateTime;
-    private boolean isUnique;
     private String groupId;
     private boolean persistent;
-    private int retryLimit = 0;
+    RetryControler retry;
     private int priority = 0;
+
     private TaskResult<T> taskResult;
     private Throwable taskException;
-
-
-    transient private boolean isAttached = false;
     private TaskStatus taskStatus = TaskStatus.NotExistsInQueue;
+
+
+    transient private TaskManager taskmanager;
     transient private ProgressManager<T> manager;
-    private boolean created = false;
 
     protected Task(TaskParams params) {
+
+        init(params);
+    }
+
+    public void init(TaskParams params) {
         if (params == null) {
             params = new TaskParams();
         }
         this.persistent = params.isPersistent();
-        this.isUnique = params.isUnique();
-        this.retryLimit = params.getRetryLimit();
+        this.retry = new RetryControler(params.getRetryLimit());
         this.groupId = params.getGroupId();
         this.priority = params.getPriority();
     }
 
-
     public void run() {
-
         taskmanager.doTask(this);
-
-//        TaskManager manager = TaskManager.DEFAULT;
-//        if (manager != null) {
-//            manager.doTask(this);
-//        } else {
-//            throw new IllegalStateException("DEFAULT static field in TaskManager class has to be set");
-//        }
     }
 
     public void cancel() {
-
         taskmanager.cancelRequest(this);
-
-//        TaskManager manager = TaskManager.DEFAULT;
-//        if (manager != null) {
-//            manager.cancelRequest(this);
-//        } else {
-//            throw new IllegalStateException("DEFAULT static field in TaskManager class has to be set");
-//        }
     }
 
     protected abstract void doWork(CancelationToken cancelToken) throws Exception;
 
-    protected void recycle() {
-    }
-
-    void setTaskmanager(TaskManager taskmanager) {
-        this.taskmanager = taskmanager;
-    }
-
-    public String getGroupId() {
-        return groupId;
-    }
-
-    public boolean isPersistent() {
-        return persistent;
-    }
-
-    public boolean isUnique() {
-        return isUnique;
-    }
+    protected void recycle() {}
 
     @NonNull
     public String getId() {
-
-        if (id == null) {
-            id = UUID.randomUUID().toString();
-        }
-
         return id;
     }
 
@@ -104,72 +69,17 @@ public abstract class Task<T> implements Serializable {
         id = uuid;
     }
 
-    boolean nextRetry() {
-        if (retryLimit > 0) {
-            retryLimit--;
-            return true;
-        } else if (retryLimit == -1) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    public TaskStatus getTaskStatus() {
-        if (!isAttached) {
-            TaskManager manager = TaskManager.DEFAULT;
-            if (manager != null) {
-                taskStatus = manager.checkExecutionStatus(this);
-                return taskStatus;
-            } else {
-                return TaskStatus.NotExistsInQueue;
-            }
-        }
-
-        return taskStatus;
-    }
-
     public TaskStatus getLastStatus() {
         return taskStatus;
     }
 
-    public TaskStatus getTaskStatus(int managerId) {
-        if (!isAttached) {
-            TaskManager manager = TaskManager.getInstance(managerId);
-            if (manager != null) {
-                taskStatus = manager.checkExecutionStatus(this);
-                return taskStatus;
-            } else {
-                return TaskStatus.NotExistsInQueue;
-            }
-        }
-
+    public TaskStatus getTaskStatus() {
         return taskStatus;
     }
 
     synchronized void setTaskStatus(TaskStatus status) {
         updateTime = System.currentTimeMillis();
         taskStatus = status;
-    }
-
-    public boolean isCreated() {
-        return created;
-    }
-
-    public void setCreated(boolean created) {
-        this.created = created;
-    }
-
-    public int getPriority() {
-        return priority;
-    }
-
-    void setIsAttached() {
-        isAttached = true;
-    }
-
-    void detachProgressManager() {
-        this.manager = null;
     }
 
     protected void notifyResult(TaskResult<T> data) {
@@ -183,8 +93,37 @@ public abstract class Task<T> implements Serializable {
         manager.onError(getId(), ex);
     }
 
+    boolean nextRetry() {
+        return retry.nextRetry();
+    }
+
+    void setTaskmanager(TaskManager taskmanager) {
+        this.taskmanager = taskmanager;
+        taskmanager.addTask(this);
+    }
+
     void attachProgressManager(ProgressManager<T> manager) {
         this.manager = manager;
+    }
+
+    void detachProgressManager() {
+        this.manager = null;
+    }
+
+    public T getTaskResult(TaskResult<T> resultData) {
+        return resultData.getResultData();
+    }
+
+    public int getPriority() {
+        return priority;
+    }
+
+    public String getGroupId() {
+        return groupId;
+    }
+
+    public boolean isPersistent() {
+        return persistent;
     }
 
     @Override
@@ -205,21 +144,11 @@ public abstract class Task<T> implements Serializable {
             return groupId.equals(taskToCheckEquality.groupId);
         }
 
-        if (isUnique) {
-            String thisClassName = this.getClass().getCanonicalName();
-            String requestClassName = taskToCheckEquality.getClass().getCanonicalName();
-            return thisClassName.equals(requestClassName);
-        }
-
         return super.equals(taskToCheckEquality);
     }
 
     @Override
     public String toString() {
         return String.format("Task %s, lastStatus %s", this.getClass().getSimpleName(), this.taskStatus.toString());
-    }
-
-    public T getTaskResult(TaskResult<T> resultData) {
-        return resultData.getResultData();
     }
 }

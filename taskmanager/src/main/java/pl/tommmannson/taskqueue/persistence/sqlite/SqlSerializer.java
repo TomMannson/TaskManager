@@ -33,37 +33,43 @@ public class SqlSerializer implements Serializer {
     @Override
     public void persist(TaskQueue queue, Task taskToPersist) {
 
+        if(!taskToPersist.isPersistent()){
+            return;
+        }
+
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
         ContentValues value = null;
         try {
             value = creator.createValueFormObject(taskToPersist);
         } catch (IOException e) {
-            Log.e("SqlSerializer", "insedted", e);
             return;
         }
 
         value.put(TaskDbContract.TaskTable.MANAGER_ID, "" + managerId);
-        if (taskToPersist.getTaskStatus() == TaskStatus.NotExistsInQueue) {
-            taskToPersist.setCreated(true);
-            long id = db.insert(TaskDbContract.TaskTable.TABLE_NAME, null,
-                    value);
-            Log.d("SqlSerializer", "insedted");
-            Log.d("SqlSerializer", "id= " + id);
 
+        if (taskToPersist.getTaskStatus() == TaskStatus.NotExistsInQueue) {
+            createTaskInDB(db, value);
         } else {
-            int data = db.update(TaskDbContract.TaskTable.TABLE_NAME,
-                    value, TaskDbContract.TaskTable.ID_COLUMN + "=?",
-                    new String[]{taskToPersist.getId()});
+            int data = editTaskInDB(taskToPersist, db, value);
+
             if (data == 0) {
-                taskToPersist.setCreated(true);
-                long id = db.insert(TaskDbContract.TaskTable.TABLE_NAME, null,
-                        value);
-                Log.d("SqlSerializer", "insedted");
-                Log.d("SqlSerializer", "id= " + id);
+                createTaskInDB(db, value);
             }
-            Log.d("SqlSerializer", "edited");
         }
+    }
+
+    private int editTaskInDB(Task taskToPersist, SQLiteDatabase db, ContentValues value) {
+        return db.update(TaskDbContract.TaskTable.TABLE_NAME,
+                value, TaskDbContract.TaskTable.ID_COLUMN + "=?",
+                new String[]{taskToPersist.getId()});
+    }
+
+    private void createTaskInDB(SQLiteDatabase db, ContentValues value) {
+        long id = db.insert(TaskDbContract.TaskTable.TABLE_NAME, null,
+                value);
+        Log.d("SqlSerializer", "insedted");
+        Log.d("SqlSerializer", "id= " + id);
     }
 
     @Override
@@ -82,8 +88,9 @@ public class SqlSerializer implements Serializer {
                 do {
 
                     Task task = creator.createObjectFromCursor(result);
-                    if (task != null)
+                    if (task != null) {
                         list.add(task);
+                    }
 
                 } while (result.moveToNext());
                 queue.addFullList(list);
