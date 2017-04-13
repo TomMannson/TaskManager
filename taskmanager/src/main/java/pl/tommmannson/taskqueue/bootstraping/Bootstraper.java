@@ -30,6 +30,9 @@ public class Bootstraper {
         for (Task task : concurrentTaskQueue.getFullList()) {
             tasks.put(task.getId(), task);
 
+            if(task.getRetryState().getRetryLimit() > 0){
+                continue;
+            }
             if (TaskStatusHelper.taskAfterExecution(task.getState().getStatus()) ||
                     task.getState().getStatus() == TaskStatus.Canceled) {
                 concurrentTaskQueue.removeWaiting(task);

@@ -23,6 +23,7 @@ public abstract class RetryControler implements Serializable {
     protected RetryControler(int retryLimit, int retryMinTime
             ,int retryMaxTime) {
         this.retryLimit = retryLimit;
+        this.retryLimit = retryLimit;
         this.retryTime = retryMinTime;
         this.retryMinTime = retryMinTime;
         this.retryMaxTime = retryMaxTime;

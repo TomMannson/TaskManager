@@ -19,7 +19,7 @@ public class SampleTask extends Task<Integer> {
         super(params.persistent(true)
                 .retryLimit(10)
                 .retryMinTime(1000)
-                .retryMaxTime(30000)
+                .retryMaxTime(5000)
                 .retryStrategy(2));
     }
 
