@@ -16,13 +16,12 @@ import pl.tommmannson.taskqueue.cancelation.CancelationException;
 import pl.tommmannson.taskqueue.cancelation.CancelationToken;
 import pl.tommmannson.taskqueue.config.TaskManagerConfiguration;
 import pl.tommmannson.taskqueue.config.di.DependencyInjector;
-import pl.tommmannson.taskqueue.persistence.RetryOperation;
+import pl.tommmannson.taskqueue.scheduler.RetryOperation;
 import pl.tommmannson.taskqueue.persistence.Serializer;
 import pl.tommmannson.taskqueue.persistence.TaskStatus;
 import pl.tommmannson.taskqueue.persistence.serialization.FileSerializer;
 import pl.tommmannson.taskqueue.persistence.sqlite.SqlSerializer;
 import pl.tommmannson.taskqueue.progress.ProgressManager;
-import pl.tommmannson.taskqueue.progress.ProgressManagerFactory;
 import pl.tommmannson.taskqueue.progress.TaskCallback;
 import pl.tommmannson.taskqueue.queues.TaskQueue;
 
@@ -90,7 +89,7 @@ public class TaskQueueThread implements Bootable, TaskManagementInterface {
             } catch (CancelationException ex) {
                 Log.d(this.getClass().getName(), String.format("%s canceled", request));
 
-                ProgressManager manager = ProgressManagerFactory.create(request.getId(), callbacks);
+                ProgressManager manager = request.createProgressManager(request.getId(), callbacks);
                 manager.postResult(request);
 
                 if (request != null) {
@@ -135,7 +134,7 @@ public class TaskQueueThread implements Bootable, TaskManagementInterface {
     private void performTaskWork(Task request) throws Exception {
         CancelationToken token = new CancelationToken();
         cancelation.put(request, token);
-        ProgressManager manager = ProgressManagerFactory.create(request.getId(), callbacks);
+        ProgressManager manager = request.createProgressManager(request.getId(), callbacks);// ProgressManagerFactory.create(request.getId(), callbacks);
 
         request.setExecutionStatus(TaskStatus.InProgress);
 

@@ -81,7 +81,7 @@ public class TaskManager {
         messageDispatcher.dispatch(message);
     }
 
-    public <T> void registerCallback(String taskId, final TaskCallback callback) {
+    public <T extends Task> void registerCallback(String taskId, final TaskCallback<T> callback) {
 
         if (taskId == null || callback == null)
             return;
@@ -93,7 +93,7 @@ public class TaskManager {
         messageDispatcher.dispatch(message);
     }
 
-    public <T> void unregisterCallback(String taskId, final TaskCallback callback) {
+    public <T extends Task> void unregisterCallback(String taskId, final TaskCallback<T> callback) {
 
         if (taskId == null || callback == null)
             return;

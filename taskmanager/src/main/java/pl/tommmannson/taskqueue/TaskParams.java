@@ -1,23 +1,18 @@
 package pl.tommmannson.taskqueue;
 
-import pl.tommmannson.taskqueue.persistence.RetryControler;
+import pl.tommmannson.taskqueue.scheduler.RetryConfig;
+import pl.tommmannson.taskqueue.scheduler.RetryControler;
+import pl.tommmannson.taskqueue.scheduler.impl.NoneRetryControler;
 
 /**
  * Created by tomasz.krol on 2016-05-06.
  */
 public class TaskParams {
 
-    private boolean isUnique = false;
     private String groupId = null;
     private boolean persistent = false;
-    private int retryLimit = 0;
     private int priority = 0;
-    private int retryStrategy = RetryControler.RETRY_STRATEGY_NONE;
-
-
-    public boolean isUnique() {
-        return isUnique;
-    }
+    private RetryConfig retryConfig = new RetryConfig();
 
     public String getGroupId() {
         return groupId;
@@ -27,21 +22,12 @@ public class TaskParams {
         return persistent;
     }
 
-    public int getRetryLimit() {
-        return retryLimit;
+    public RetryConfig getRetryConfig() {
+        return retryConfig;
     }
 
     public int getPriority() {
         return priority;
-    }
-
-    public int getRetryStrategy() {
-        return retryStrategy;
-    }
-
-    public TaskParams unique(boolean unique) {
-        isUnique = unique;
-        return this;
     }
 
     public TaskParams groupId(String groupId) {
@@ -55,12 +41,22 @@ public class TaskParams {
     }
 
     public TaskParams retryLimit(int retryLimit) {
-        this.retryLimit = retryLimit;
+        this.retryConfig.retryLimit(retryLimit);
         return this;
     }
 
     public TaskParams retryStrategy(int retryStrategy) {
-        this.retryStrategy = retryStrategy;
+        this.retryConfig.retryStrategy(retryStrategy);
+        return this;
+    }
+
+    public TaskParams retryMinTime(int retryMinTime) {
+        this.retryConfig.retryMinTime(retryMinTime);
+        return this;
+    }
+
+    public TaskParams retryMaxTime(int retryMaxTime) {
+        this.retryConfig.retryMaxTime(retryMaxTime);
         return this;
     }
 

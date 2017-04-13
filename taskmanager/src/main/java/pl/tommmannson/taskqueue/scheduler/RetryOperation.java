@@ -1,4 +1,4 @@
-package pl.tommmannson.taskqueue.persistence;
+package pl.tommmannson.taskqueue.scheduler;
 
 /**
  * Created by tomasz.krol on 2017-04-12.

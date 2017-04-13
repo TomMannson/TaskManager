@@ -1,13 +1,12 @@
 package pl.tommmannson.taskqueue.progress;
 
-import pl.tommmannson.taskqueue.TaskResult;
-import pl.tommmannson.taskqueue.persistence.TaskState;
+import pl.tommmannson.taskqueue.Task;
 
 /**
  * Created by tomasz.krol on 2015-11-13.
  */
-public interface TaskCallback {
+public interface TaskCallback<T extends Task> {
 
-    void onResult(String id, TaskState state);
+    void onResult(String id, T task);
     void onError(String id, Throwable ex);
 }

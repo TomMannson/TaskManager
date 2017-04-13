@@ -16,16 +16,17 @@ import pl.tommmannson.taskqueue.cancelation.CancelationToken;
 
 public class SampleTask extends Task<Integer> {
     public SampleTask(TaskParams params) {
-        super(new TaskParams().persistent(true)
+        super(params.persistent(true)
                 .retryLimit(10)
-                .retryStrategy(2)
-                .unique(true));
+                .retryMinTime(1000)
+                .retryMaxTime(30000)
+                .retryStrategy(2));
     }
 
     @Override
     protected void doWork(CancelationToken cancelToken) throws Exception {
         Log.e(SampleTask.class.getSimpleName(), "finished");
-        Thread.sleep(2000);
+//        Thread.sleep(2000);
 //        notifyResult(TaskResult.progressResult(1));
         notifyError(new InvalidClassException("asd"));
 //        SampleTask2 task2 = new SampleTask2();

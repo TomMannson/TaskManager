@@ -2,10 +2,9 @@ package pl.tommmannson.taskqueue.queues;
 
 
 import java.util.List;
-import java.util.concurrent.ThreadPoolExecutor;
 
 import pl.tommmannson.taskqueue.Task;
-import pl.tommmannson.taskqueue.persistence.RetryOperation;
+import pl.tommmannson.taskqueue.scheduler.RetryOperation;
 
 /**
  * Created by tomasz.krol on 2016-10-24.

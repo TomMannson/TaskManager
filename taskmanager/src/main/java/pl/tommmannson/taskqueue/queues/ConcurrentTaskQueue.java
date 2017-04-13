@@ -11,11 +11,9 @@ import java.util.TimerTask;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.PriorityBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
 
 import pl.tommmannson.taskqueue.Task;
-import pl.tommmannson.taskqueue.persistence.RetryOperation;
-import pl.tommmannson.taskqueue.persistence.Serializer;
+import pl.tommmannson.taskqueue.scheduler.RetryOperation;
 
 /**
  * Created by tomasz.krol on 2016-02-02.

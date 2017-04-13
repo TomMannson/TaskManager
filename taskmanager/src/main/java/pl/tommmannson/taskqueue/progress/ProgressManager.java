@@ -13,7 +13,7 @@ import pl.tommmannson.taskqueue.persistence.TaskState;
 /**
  * Created by tomasz.krol on 2016-01-29.
  */
-public class ProgressManager<T> {
+public class ProgressManager<T extends Task> {
 
     List<TaskCallback> callbacks = null;
     Handler handler = new Handler(Looper.getMainLooper());
@@ -22,14 +22,14 @@ public class ProgressManager<T> {
         this.callbacks = callback;
     }
 
-    public void postResult(final Task task) {
+    public void postResult(final T task) {
         if (callbacks != null) {
-            for (final TaskCallback callback : callbacks) {
+            for (final TaskCallback<T> callback : callbacks) {
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
                         Log.d("ProgressManager", "postResult "+callback.getClass().getSimpleName());
-                        callback.onResult(task.getId(), task.getState());
+                        callback.<T>onResult(task.getId(), task);
                     }
                 });
             }
@@ -50,7 +50,7 @@ public class ProgressManager<T> {
 //        }
 //    }
 
-    public void onError(final Task task) {
+    public void onError(final Task<T> task) {
         if (callbacks != null) {
             for (final TaskCallback callback : callbacks) {
                 handler.post(new Runnable() {

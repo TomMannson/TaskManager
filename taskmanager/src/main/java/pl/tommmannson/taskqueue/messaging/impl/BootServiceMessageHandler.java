@@ -31,13 +31,10 @@ public class BootServiceMessageHandler implements MessageHandler<BootServiceMess
         } else {
 
             if (!tryToStartService(message)) {
-//            Logger.d(this.getClass(), "Service was not started as Activity died prematurely");
                 return;
             }
 
-//            if (!isBinded) {
             bindService(message);
-//            }
         }
     }
 

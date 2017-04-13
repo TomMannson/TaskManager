@@ -9,11 +9,10 @@ import android.widget.Toast;
 
 import pl.tommmannson.taskqueue.TaskManager;
 import pl.tommmannson.taskqueue.TaskParams;
-import pl.tommmannson.taskqueue.persistence.TaskState;
 import pl.tommmannson.taskqueue.progress.OnManagerReadyListener;
 import pl.tommmannson.taskqueue.progress.TaskCallback;
 
-public class MainActivity extends AppCompatActivity implements TaskCallback, OnManagerReadyListener {
+public class MainActivity extends AppCompatActivity implements TaskCallback<SampleTask>, OnManagerReadyListener {
 
     final static String downloadItemsRequest = "downloadItemsRequest";
     SampleTask task = null;
@@ -51,23 +50,29 @@ public class MainActivity extends AppCompatActivity implements TaskCallback, OnM
         manager.unregisterCallback(downloadItemsRequest, this);
     }
 
+//    @Override
+//    public void onResult(String id, TaskState result) {
+//        switch (id) {
+//            case downloadItemsRequest: {
+//                Integer data = result.getResult().getResultData();
+//                Toast.makeText(this, "finished", Toast.LENGTH_SHORT).show();
+//                break;
+//            }
+//            default: {
+//                Toast.makeText(this, "secondTask", Toast.LENGTH_SHORT).show();
+//            }
+//        }
+//    }
+
+
     @Override
-    public void onResult(String id, TaskState result) {
-        switch (id) {
-            case downloadItemsRequest: {
-                Integer data = result.getResult().getResultData();
-                Toast.makeText(this, "finished", Toast.LENGTH_SHORT).show();
-                break;
-            }
-            default: {
-                Toast.makeText(this, "secondTask", Toast.LENGTH_SHORT).show();
-            }
-        }
+    public void onResult(String id, SampleTask task) {
+
     }
 
     @Override
     public void onError(String id, Throwable ex) {
-
+        Toast.makeText(this, "Error", Toast.LENGTH_SHORT).show();
     }
 
     @Override
