@@ -22,7 +22,7 @@ public class Bootstraper {
 
         Serializer serializer = bootstrapable.getSerializer();
         TaskQueue concurrentTaskQueue = new ConcurrentTaskQueue();
-        Map<String, Task<?>> tasks = bootstrapable.getTasks();
+        Map<String, Task<?, ?>> tasks = bootstrapable.getTasks();
 
         bootstrapable.setConcurrentTaskQueue(concurrentTaskQueue);
         serializer.restore(concurrentTaskQueue);

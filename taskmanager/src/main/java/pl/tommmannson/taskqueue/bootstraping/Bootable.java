@@ -14,7 +14,7 @@ import pl.tommmannson.taskqueue.queues.TaskQueue;
 public interface Bootable extends Runnable {
     Serializer getSerializer();
 
-    Map<String,Task<?>> getTasks();
+    Map<String,Task<?, ?>> getTasks();
 
     void setConcurrentTaskQueue(TaskQueue concurrentTaskQueue);
 

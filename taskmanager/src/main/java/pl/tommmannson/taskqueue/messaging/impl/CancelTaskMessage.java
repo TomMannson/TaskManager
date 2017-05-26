@@ -16,13 +16,13 @@ public class CancelTaskMessage extends AbsMessage {
         super(1);
     }
 
-    Task<?> task;
+    Task<?, ?> task;
 
-    public Task<?> getTask() {
+    public Task<?, ?> getTask() {
         return task;
     }
 
-    public void setTask(Task<?> task) {
+    public void setTask(Task<?, ?> task) {
         this.task = task;
     }
 }

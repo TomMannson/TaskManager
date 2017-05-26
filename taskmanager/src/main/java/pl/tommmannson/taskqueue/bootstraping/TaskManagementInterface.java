@@ -9,9 +9,9 @@ import pl.tommmannson.taskqueue.progress.TaskCallback;
  * Created by tomasz.krol on 2016-12-06.
  */
 public interface TaskManagementInterface {
-    void addRequest(Task<?> task);
+    void addRequest(Task<?, ?> task);
 
-    void cancelRequest(Task<?> request);
+    void cancelRequest(Task<?, ?> request);
 
     void cancelAll();
 

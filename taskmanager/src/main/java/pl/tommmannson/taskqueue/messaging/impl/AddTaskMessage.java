@@ -14,13 +14,13 @@ public class AddTaskMessage extends AbsMessage {
         super(2);
     }
 
-    Task<?> task;
+    Task<?, ?> task;
 
-    public Task<?> getTask() {
+    public Task<?, ?> getTask() {
         return task;
     }
 
-    public void setTask(Task<?> task) {
+    public void setTask(Task<?, ?> task) {
         this.task = task;
     }
 }

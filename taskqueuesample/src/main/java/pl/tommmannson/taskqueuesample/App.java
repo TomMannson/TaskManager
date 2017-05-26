@@ -8,6 +8,7 @@ import com.birbit.android.jobqueue.config.Configuration;
 import pl.tommmannson.taskqueue.TaskManager;
 import pl.tommmannson.taskqueue.config.DefaultTaskManagerConfiguration;
 import pl.tommmannson.taskqueue.config.TaskManagerConfiguration;
+import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 
 /**
  * Created by tomasz.krol on 2016-12-06.
@@ -20,6 +21,12 @@ public class App extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+
+        CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
+                .setDefaultFontPath("fonts/Roboto-Bold.ttf")
+                .setFontAttrId(R.attr.fontPath)
+                .build()
+        );
 
 //        JOB_MANAGER = new JobManager(new Configuration.Builder(this)
 //                .minConsumerCount(1)//always keep at least one consumer alive

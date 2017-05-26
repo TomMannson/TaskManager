@@ -8,10 +8,10 @@ import pl.tommmannson.taskqueue.TaskResult;
  * Created by tomasz.krol on 2017-04-12.
  */
 
-public class TaskState implements Serializable {
+public class TaskState<T> implements Serializable {
 
     TaskStatus status = TaskStatus.NotExistsInQueue;
-    TaskResult<?> result = null;
+    T result = null;
     Exception exception = null;
 
     public TaskStatus getStatus() {
@@ -22,11 +22,11 @@ public class TaskState implements Serializable {
         this.status = status;
     }
 
-    public TaskResult<?> getResult() {
+    public T getResult() {
         return result;
     }
 
-    public void setResult(TaskResult<?> result) {
+    public void setResult(T result) {
         this.result = result;
         this.exception = null;
     }

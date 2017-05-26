@@ -56,13 +56,13 @@ public class TaskService extends Service implements TaskManagementInterface{
     }
 
     @Override
-    public void addRequest(Task<?> task) {
+    public void addRequest(Task<?, ?> task) {
 
         taskQueueThread.addRequest(task);
     }
 
     @Override
-    public void cancelRequest(Task<?> request) {
+    public void cancelRequest(Task<?, ?> request) {
 
         taskQueueThread.cancelRequest(request);
     }

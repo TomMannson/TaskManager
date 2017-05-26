@@ -40,7 +40,9 @@ public class QueueReadyNotifer {
             mainHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    listener.onTaskManagerReady(manager.getId());
+                    if(listeners.contains(listener)) {
+                        listener.onTaskManagerReady(manager.getId());
+                    }
                 }
             });
         }

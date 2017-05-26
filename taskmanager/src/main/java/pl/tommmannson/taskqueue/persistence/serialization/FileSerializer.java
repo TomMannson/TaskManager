@@ -33,8 +33,8 @@ public class FileSerializer implements Serializer {
             FileOutputStream fileOut =
                     new FileOutputStream(new File(pathToHoldSavedTasks));
             ObjectOutputStream out = new ObjectOutputStream(fileOut);
-            List<Task<?>> listToWrite = new ArrayList<>();
-            for (Task<?> task: queue.getFullList()) {
+            List<Task<?, ?>> listToWrite = new ArrayList<>();
+            for (Task<?, ?> task: queue.getFullList()) {
                 if(task.isPersistent()) {
                     listToWrite.add(task);
                 }
@@ -52,7 +52,7 @@ public class FileSerializer implements Serializer {
             FileInputStream fileOut =
                     new FileInputStream(new File(pathToHoldSavedTasks));
             ObjectInputStream in = new ObjectInputStream(fileOut);
-            queue.addFullList((List<Task<?>>) in.readObject());
+            queue.addFullList((List<Task<?, ?>>) in.readObject());
             fileOut.close();
         } catch (IOException ex) {
             ex.toString();

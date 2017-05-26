@@ -70,7 +70,7 @@ public class TaskManager {
         messageDispatcher.dispatch(message);
     }
 
-    public <T> void doTask(final Task<T> task) {
+    public <T> void doTask(final Task<T, ?> task) {
 
         if (task == null)
             return;
@@ -81,7 +81,7 @@ public class TaskManager {
         messageDispatcher.dispatch(message);
     }
 
-    public <T extends Task> void registerCallback(String taskId, final TaskCallback<T> callback) {
+    public void registerCallback(String taskId, final TaskCallback callback) {
 
         if (taskId == null || callback == null)
             return;
@@ -93,7 +93,7 @@ public class TaskManager {
         messageDispatcher.dispatch(message);
     }
 
-    public <T extends Task> void unregisterCallback(String taskId, final TaskCallback<T> callback) {
+    public void unregisterCallback(String taskId, final TaskCallback callback) {
 
         if (taskId == null || callback == null)
             return;
@@ -105,7 +105,7 @@ public class TaskManager {
         messageDispatcher.dispatch(message);
     }
 
-    public <T> void cancelRequest(final Task<T> task) {
+    public <T> void cancelRequest(final Task<T, ?> task) {
 
         if (task == null)
             return;

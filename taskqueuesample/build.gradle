@@ -33,4 +33,5 @@ dependencies {
 //    compile 'com.tommannson.taskmanager:taskmanager:0.5.1'
     compile project(':taskmanager')
     compile 'com.birbit:android-priority-jobqueue:2.0.1'
+    compile 'uk.co.chrisjenx:calligraphy:2.2.0'
 }

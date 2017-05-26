@@ -1,7 +1,7 @@
 package pl.tommmannson.taskqueue;
 
 
-import android.support.annotation.NonNull;
+//import android.support.annotation.NonNull;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -21,7 +21,7 @@ import pl.tommmannson.taskqueue.scheduler.RetrySchedulerFactory;
 /**
  * Created by Tomasz Król on 2015-11-13.
  */
-public abstract class Task<T> implements Serializable {
+public abstract class Task<T, Progress> implements Serializable {
 
 
     private String id;
@@ -31,10 +31,10 @@ public abstract class Task<T> implements Serializable {
     RetryControler retry;
     private int priority = 0;
 
-    TaskState state = new TaskState();
+    TaskState<T> state = new TaskState<>();
 
     transient private TaskManager taskmanager;
-    transient private ProgressManager<Task<T>> manager;
+    transient private ProgressManager<T, Progress> manager;
 
     protected Task(TaskParams params) {
 
@@ -60,12 +60,20 @@ public abstract class Task<T> implements Serializable {
         taskmanager.cancelRequest(this);
     }
 
+    public void register(final TaskCallback<T, Progress> callback){
+        taskmanager.registerCallback(getId(), callback);
+    }
+
+    public void unregister(final TaskCallback<T, Progress> callback){
+        taskmanager.unregisterCallback(getId(), callback);
+    }
+
     protected abstract void doWork(CancelationToken cancelToken) throws Exception;
 
     protected void recycle() {
     }
 
-    @NonNull
+//    @NonNull
     public String getId() {
         return id;
     }
@@ -74,7 +82,7 @@ public abstract class Task<T> implements Serializable {
         id = uuid;
     }
 
-    public TaskState getState() {
+    public TaskState<T> getState() {
         return state;
     }
 
@@ -83,15 +91,27 @@ public abstract class Task<T> implements Serializable {
         updateTime = System.currentTimeMillis();
     }
 
-    protected void notifyResult(TaskResult<T> data) {
+    protected void notifyResult(T data) {
         state.setResult(data);//taskResult = data;
+//        manager.postResult(this);
+//        data.setTargetType(this.getClass());
+    }
+
+    protected void notifyProgress(TaskResult<Progress> progress) {
+//        state.setResult(data);//taskResult = data;
+        manager.postProgress(getId(), progress);
+//        data.setTargetType(this.getClass());
+    }
+
+    void sendResult() {
+//        state.setResult(data);//taskResult = data;
         manager.postResult(this);
-        data.setTargetType(this.getClass());
+//        data.setTargetType(this.getClass());
     }
 
     protected void notifyError(Throwable ex) {
         state.setException((Exception) ex);
-        manager.onError((Task<Task<T>>) this);
+        manager.onError(this);
     }
 
     boolean nextRetry() {
@@ -107,7 +127,7 @@ public abstract class Task<T> implements Serializable {
         taskmanager.addTask(this);
     }
 
-    void attachProgressManager(ProgressManager<Task<T>> manager) {
+    void attachProgressManager(ProgressManager<T, Progress> manager) {
         this.manager = manager;
     }
 
@@ -153,8 +173,9 @@ public abstract class Task<T> implements Serializable {
         return String.format("Task %s, lastStatus %s", this.getClass().getSimpleName(), this.state.getStatus().toString());
     }
 
-    ProgressManager<Task<T>> createProgressManager(String requestId, Map<String, List<TaskCallback>> callbacks) {
-        List<TaskCallback> obj = callbacks.get(requestId);
+    ProgressManager<T, Progress> createProgressManager(String requestId, Map<String, List> callbacks) {
+//        Object downCast = callbacks.get(requestId);
+        List<TaskCallback<T, Progress>> obj = callbacks.get(requestId);//callbacks.get(requestId);
 
         if (obj == null) {
             obj = new ArrayList<>();

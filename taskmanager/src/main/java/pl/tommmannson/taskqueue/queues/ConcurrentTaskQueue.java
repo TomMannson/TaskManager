@@ -20,11 +20,11 @@ import pl.tommmannson.taskqueue.scheduler.RetryOperation;
  */
 public class ConcurrentTaskQueue implements TaskQueue {
 
-    private BlockingQueue<Task<?>> workQueue = null;
-    private BlockingQueue<Task<?>> uniqueTasks = null;
+    private BlockingQueue<Task<?, ?>> workQueue = null;
+    private BlockingQueue<Task<?, ?>> uniqueTasks = null;
     private Map<String, Task> pendingTask = null;
 
-    Comparator<? super Task<?>> DEFAULT_TASK_COMPARATOR = new Comparator<Task<?>>() {
+    Comparator<? super Task<?, ?>> DEFAULT_TASK_COMPARATOR = new Comparator<Task<?, ?>>() {
         @Override
         public int compare(Task lhs, Task rhs) {
             return lhs.getPriority() - rhs.getPriority();
@@ -82,15 +82,15 @@ public class ConcurrentTaskQueue implements TaskQueue {
     }
 
     @Override
-    public List<Task<?>> getFullList() {
-        List<Task<?>> fullList = new ArrayList<>();
+    public List<Task<?, ?>> getFullList() {
+        List<Task<?, ?>> fullList = new ArrayList<>();
         fullList.addAll(uniqueTasks);
         fullList.addAll(workQueue);
         return fullList;
     }
 
     @Override
-    public void addFullList(List<Task<?>> listToAdd) {
+    public void addFullList(List<Task<?, ?>> listToAdd) {
         workQueue.addAll(listToAdd);
     }
 

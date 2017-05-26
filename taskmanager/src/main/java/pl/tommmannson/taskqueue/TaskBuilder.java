@@ -34,6 +34,14 @@ public class TaskBuilder<T extends Task> {
         return this;
     }
 
+    public T getOrCreate() {
+        T task = get();
+        if (task == null) {
+            task = create();
+        }
+        return task;
+    }
+
     public T get() {
         Task task = manager.service.findTaskById(id);
         if (task != null && task.getClass().equals(taskClass)) {
@@ -50,23 +58,9 @@ public class TaskBuilder<T extends Task> {
             task.setTaskmanager(manager);
             return task;
 
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        } catch (NoSuchMethodException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
-    }
-
-    public T getOrCreate() {
-        T task = get();
-        if (task == null) {
-            task = create();
-        }
-        return task;
     }
 }

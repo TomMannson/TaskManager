@@ -2,7 +2,7 @@ package pl.tommmannson.taskqueue.config;
 
 
 import android.content.Context;
-import android.support.annotation.IntDef;
+//import android.support.annotation.IntDef;
 
 import java.lang.annotation.Retention;
 
@@ -123,13 +123,13 @@ public class TaskManagerConfiguration {
     }
 
     @Retention(SOURCE)
-    @IntDef({FILE_SERIALIZABLE, SQLITE_SERIALIZABLE})
+//    @IntDef({FILE_SERIALIZABLE, SQLITE_SERIALIZABLE})
     public @interface NavigationMode {}
     public static final int FILE_SERIALIZABLE = 0;
     public static final int SQLITE_SERIALIZABLE = 1;
 
     @Retention(SOURCE)
-    @IntDef({SERVICE_QUEUE, THREAD_POOL_QUEUE})
+//    @IntDef({SERVICE_QUEUE, THREAD_POOL_QUEUE})
     public @interface QueueMode {}
     public static final int SERVICE_QUEUE = 0;
     public static final int THREAD_POOL_QUEUE = 1;

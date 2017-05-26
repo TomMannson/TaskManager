@@ -35,8 +35,8 @@ public class TaskQueueThread implements Bootable, TaskManagementInterface {
     private final Context ctx;
 
     private Map<String, List<TaskCallback>> callbacks = new HashMap<>();
-    final private Map<Task<?>, CancelationToken> cancelation = new HashMap<>();
-    final private Map<String, Task<?>> tasks = new HashMap<>();
+    final private Map<Task<?, ?>, CancelationToken> cancelation = new HashMap<>();
+    final private Map<String, Task<?, ?>> tasks = new HashMap<>();
     private TaskQueue concurrentTaskQueue = null;
     private Serializer serializer;
 
@@ -44,8 +44,6 @@ public class TaskQueueThread implements Bootable, TaskManagementInterface {
     DependencyInjector injector = null;
     ThreadPoolExecutor workerThreadPool = null;
     private boolean tasksLoadedFlag;
-    private boolean logger;
-    private int queueId;
     private int serialisationType;
 
     public TaskQueueThread(Context ctx){
@@ -58,7 +56,6 @@ public class TaskQueueThread implements Bootable, TaskManagementInterface {
 
     @Override
     public void setQueueId(int queueId) {
-        this.queueId = queueId;
         if(serialisationType == TaskManagerConfiguration.FILE_SERIALIZABLE){
             serializer = new FileSerializer(ctx, queueId);
         }
@@ -81,6 +78,8 @@ public class TaskQueueThread implements Bootable, TaskManagementInterface {
                 }
 
                 performTaskWork(request);
+                request.sendResult();
+
 
                 concurrentTaskQueue.removeProcessing(request);
 
@@ -89,10 +88,10 @@ public class TaskQueueThread implements Bootable, TaskManagementInterface {
             } catch (CancelationException ex) {
                 Log.d(this.getClass().getName(), String.format("%s canceled", request));
 
-                ProgressManager manager = request.createProgressManager(request.getId(), callbacks);
-                manager.postResult(request);
-
                 if (request != null) {
+
+                    request.notifyResult(TaskResult.cancelResult(null));
+
                     cancelation.remove(request);
                     concurrentTaskQueue.removeProcessing(request);
                     request.setExecutionStatus(TaskStatus.Canceled);
@@ -105,10 +104,13 @@ public class TaskQueueThread implements Bootable, TaskManagementInterface {
                 if (request != null) {
                     if (request.nextRetry()) {
                         //concurrentTaskQueue.moveFromExecutingToWaiting(request);
-                        concurrentTaskQueue.moveToPending(request, new RetryOperation() {
+                        final Task requestToRetry = request;
+                        concurrentTaskQueue.moveToPending(requestToRetry, new RetryOperation() {
                             @Override
                             public void doOnRetry() {
-                                workerThreadPool.execute(TaskQueueThread.this);
+                                if(!cancelation.get(requestToRetry).isCanceled()) {
+                                    workerThreadPool.execute(TaskQueueThread.this);
+                                }
                             }
                         });
                         workerThreadPool.execute(this);
@@ -132,10 +134,13 @@ public class TaskQueueThread implements Bootable, TaskManagementInterface {
     }
 
     private void performTaskWork(Task request) throws Exception {
-        CancelationToken token = new CancelationToken();
-        cancelation.put(request, token);
-        ProgressManager manager = request.createProgressManager(request.getId(), callbacks);// ProgressManagerFactory.create(request.getId(), callbacks);
+        CancelationToken token = cancelation.get(request);
+        if(token == null){
+            token = new CancelationToken();
+            cancelation.put(request, token);
+        }
 
+        ProgressManager manager = request.createProgressManager(request.getId(), callbacks);
         request.setExecutionStatus(TaskStatus.InProgress);
 
         if (injector != null) {
@@ -151,7 +156,7 @@ public class TaskQueueThread implements Bootable, TaskManagementInterface {
         request.setExecutionStatus(TaskStatus.SuccessfullyFinished);
     }
 
-    public void addRequest(Task<?> task) {
+    public void addRequest(Task<?, ?> task) {
 
         if (concurrentTaskQueue.pushToQueue(task)) {
             tasks.put(task.getId(), task);
@@ -164,7 +169,7 @@ public class TaskQueueThread implements Bootable, TaskManagementInterface {
         }
     }
 
-    public void cancelRequest(Task<?> request) {
+    public void cancelRequest(Task<?, ?> request) {
 
         if (concurrentTaskQueue.removeWaiting(request)) {
             request.setExecutionStatus(TaskStatus.Canceled);
@@ -177,12 +182,11 @@ public class TaskQueueThread implements Bootable, TaskManagementInterface {
 
     public void cancelAll() {
 
-        for (Map.Entry<Task<?>, CancelationToken> entry : cancelation.entrySet()) {
+        for (Map.Entry<Task<?, ?>, CancelationToken> entry : cancelation.entrySet()) {
             entry.getValue().cancel();
             entry.getKey().setExecutionStatus(TaskStatus.Canceled);
         }
 
-//        callbacks.clear();
         concurrentTaskQueue.clear();
     }
 
@@ -212,6 +216,16 @@ public class TaskQueueThread implements Bootable, TaskManagementInterface {
         return tasks.get(id);
     }
 
+    public Task[] findByIds(String... ids) {
+
+        Task[] tasksFound = new Task[ids.length];
+
+        for(int i = 0; i < ids.length; i++){
+            tasksFound[i] = tasks.get(ids[i]);
+        }
+        return tasksFound;
+    }
+
 
     public synchronized boolean tasksLoaded() {
         return this.tasksLoadedFlag;
@@ -228,7 +242,7 @@ public class TaskQueueThread implements Bootable, TaskManagementInterface {
     }
 
     @Override
-    public Map<String, Task<?>> getTasks() {
+    public Map<String, Task<?, ?>> getTasks() {
         return tasks;
     }
 
@@ -255,7 +269,7 @@ public class TaskQueueThread implements Bootable, TaskManagementInterface {
     public void configure(TaskManagerConfiguration configuration) {
         this.injector = configuration.getInjector();
         this.workerThreadCount = configuration.getMaxWorkerCount();
-        this.logger = configuration.getLogging();
+//        this.logger = configuration.getLogging();
         this.serialisationType = configuration.getTaskMethodSerialisation();
     }
 

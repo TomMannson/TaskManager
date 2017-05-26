@@ -17,6 +17,12 @@ public class CancelationToken {
         }
     }
 
+    public boolean isCanceled(){
+        return canceled;
+//            throw new CancelationException();
+//        }
+    }
+
     public void forceCancellation(){
         canceled = true;
         throwCancelSignal();

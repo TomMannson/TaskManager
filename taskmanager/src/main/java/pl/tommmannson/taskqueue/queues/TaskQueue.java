@@ -26,9 +26,9 @@ public interface TaskQueue {
 
     void clear();
 
-    List<Task<?>> getFullList();
+    List<Task<? ,?>> getFullList();
 
-    void addFullList(List<Task<?>> listToAdd);
+    void addFullList(List<Task<?, ?>> listToAdd);
 
-    void moveToPending(Task request, final RetryOperation operation);
+    void moveToPending(final Task request, final RetryOperation operation);
 }

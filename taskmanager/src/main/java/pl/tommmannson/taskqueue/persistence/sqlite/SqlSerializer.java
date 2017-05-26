@@ -75,7 +75,7 @@ public class SqlSerializer implements Serializer {
     @Override
     public void restore(TaskQueue queue) {
         Cursor result = null;
-        List<Task<?>> list = new ArrayList<>();
+        List<Task<?, ?>> list = new ArrayList<>();
         try {
             result = dbHelper.getReadableDatabase()
                     .query(TaskDbContract.TaskTable.TABLE_NAME,
