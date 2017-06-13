@@ -9,6 +9,9 @@ import java.util.List;
 import java.util.Map;
 
 import pl.tommmannson.taskqueue.cancelation.CancelationToken;
+import pl.tommmannson.taskqueue.progress.ErrorCallback;
+import pl.tommmannson.taskqueue.progress.ResultCallback;
+import pl.tommmannson.taskqueue.progress.TaskCallbackWrapper;
 import pl.tommmannson.taskqueue.scheduler.RetryConfig;
 import pl.tommmannson.taskqueue.scheduler.RetryControler;
 import pl.tommmannson.taskqueue.persistence.TaskState;
@@ -36,7 +39,7 @@ public abstract class Task<T, Progress> implements Serializable {
     transient private TaskManager taskmanager;
     transient private ProgressManager<T, Progress> manager;
 
-    protected Task(TaskParams params) {
+    public Task(TaskParams params) {
 
         init(params);
     }
@@ -66,6 +69,36 @@ public abstract class Task<T, Progress> implements Serializable {
 
     public void unregister(final TaskCallback<T, Progress> callback){
         taskmanager.unregisterCallback(getId(), callback);
+    }
+
+    public void registerPartial(ResultCallback<T> result){
+        TaskCallbackWrapper<T, Progress> wrapper
+                = new TaskCallbackWrapper<>(result, null, null);
+
+        taskmanager.registerCallback(getId(), wrapper);
+    }
+
+    public void unregisterPartial(ResultCallback<T> result){
+
+        TaskCallbackWrapper<T, Progress> wrapper
+                = new TaskCallbackWrapper<>(result, null, null);
+
+        taskmanager.unregisterCallback(getId(), wrapper);
+    }
+
+    public void registerPartial(ResultCallback<T> result, ErrorCallback errorCallback){
+        TaskCallbackWrapper<T, Progress> wrapper
+                = new TaskCallbackWrapper<>(result, null, errorCallback);
+
+        taskmanager.registerCallback(getId(), wrapper);
+    }
+
+    public void unregisterPartial(ResultCallback<T> result, ErrorCallback errorCallback){
+
+        TaskCallbackWrapper<T, Progress> wrapper
+                = new TaskCallbackWrapper<>(result, null, errorCallback);
+
+        taskmanager.unregisterCallback(getId(), wrapper);
     }
 
     protected abstract void doWork(CancelationToken cancelToken) throws Exception;

@@ -29,7 +29,7 @@ public class ProgressManager<Result, Progress> {
                     @Override
                     public void run() {
                         Log.d("ProgressManager", "postResult "+callback.getClass().getSimpleName());
-                        callback.<Result>onResult(task.getId(), task);
+                        callback.<Result>onResult(task);
                     }
                 });
             }

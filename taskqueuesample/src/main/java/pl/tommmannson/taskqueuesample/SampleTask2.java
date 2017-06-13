@@ -13,8 +13,8 @@ import pl.tommmannson.taskqueue.cancelation.CancelationToken;
  */
 
 public class SampleTask2 extends Task1<String> {
-    protected SampleTask2() {
-        super(new TaskParams().persistent(true));
+    public SampleTask2(TaskParams params) {
+        super(params);
     }
 
     @Override

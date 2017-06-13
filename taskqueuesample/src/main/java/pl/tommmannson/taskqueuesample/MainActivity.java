@@ -1,6 +1,5 @@
 package pl.tommmannson.taskqueuesample;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -11,13 +10,11 @@ import android.widget.Toast;
 import pl.tommmannson.taskqueue.Task;
 import pl.tommmannson.taskqueue.TaskManager;
 import pl.tommmannson.taskqueue.TaskParams;
-import pl.tommmannson.taskqueue.TaskResult;
+import pl.tommmannson.taskqueue.progress.ErrorCallback;
 import pl.tommmannson.taskqueue.progress.OnManagerReadyListener;
-import pl.tommmannson.taskqueue.progress.TaskCallback;
-import pl.tommmannson.taskqueue.utils.CallForwarder;
-import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
+import pl.tommmannson.taskqueue.progress.ResultCallback;
 
-public class MainActivity extends AppCompatActivity implements TaskCallback,  OnManagerReadyListener {
+public class MainActivity extends AppCompatActivity implements OnManagerReadyListener, ErrorCallback {
 
     final static String downloadItemsRequest = "downloadItemsRequest";
     final static String downloadItemsRequest2 = "downloadItemsReques2";
@@ -26,15 +23,9 @@ public class MainActivity extends AppCompatActivity implements TaskCallback,  On
     private SampleTask2 task2;
 
     @Override
-    protected void attachBaseContext(Context newBase) {
-        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
-    }
-
-    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         manager = TaskManager.getInstance(1);
-
 
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -51,74 +42,53 @@ public class MainActivity extends AppCompatActivity implements TaskCallback,  On
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
+    protected void onStart() {
+        super.onStart();
         manager.registerMessageQueueReady(this);
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
+    protected void onStop() {
+        super.onStop();
         manager.unregisterMessageQueueReady(this);
-        if(task != null)
-            task.unregister(this);
-    }
-
-//    @Override
-//    public void onResult(String id, TaskState result) {
-//        switch (id) {
-//            case downloadItemsRequest: {
-//                Integer data = result.getResult().getResultData();
-//                Toast.makeText(this, "finished", Toast.LENGTH_SHORT).show();
-//                break;
-//            }
-//            default: {
-//                Toast.makeText(this, "secondTask", Toast.LENGTH_SHORT).show();
-//            }
-//        }
-//    }
-
-    @Override
-    public void onResult(String id, Task task) {
-        if(this.task == task){
-            Toast.makeText(getApplicationContext(), "SimpleTask", Toast.LENGTH_SHORT).show();
-        }
-        else {
-            CallForwarder.forwardCall(this, id, task);
-        }
-    }
-
-    @Override
-    public void onProgress(String id, TaskResult result) {
-
-    }
-
-
-    public void onResult(String id, SampleTask task) {
-
-        Toast.makeText(getApplicationContext(), "SimpleTask", Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void onError(String id, Throwable ex) {
-        Toast.makeText(this, "Error", Toast.LENGTH_SHORT).show();
+        if (task != null)
+            task.unregisterPartial(intCallback, this);
+        if (task2 != null)
+            task2.unregisterPartial(stringCallback, this);
     }
 
     @Override
     public void onTaskManagerReady(long id) {
         task = manager.build(SampleTask.class)
                 .id(downloadItemsRequest)
-                .params(new TaskParams().retryLimit(10).retryStrategy(2))
                 .getOrCreate();
-
-        task.register(this);
 
         task2 = manager.build(SampleTask2.class)
                 .id(downloadItemsRequest2)
-                .params(new TaskParams().retryLimit(10).retryStrategy(2))
                 .getOrCreate();
 
-        task2.register(this);
+        task.registerPartial(intCallback, this);
+        task2.registerPartial(stringCallback, this);
+    }
 
+    ResultCallback<Integer> intCallback = new ResultCallback<Integer>() {
+        @Override
+        public void onResult(Task<Integer, ?> task) {
+            Integer data = task.getState().getResult();
+            Toast.makeText(MainActivity.this, "finished", Toast.LENGTH_SHORT).show();
+        }
+    };
+
+    ResultCallback<String> stringCallback = new ResultCallback<String>() {
+        @Override
+        public void onResult(Task<String, ?> task) {
+            Toast.makeText(MainActivity.this, "secondTask"
+                    + task.getState().getResult(), Toast.LENGTH_SHORT).show();
+        }
+    };
+
+    @Override
+    public void onError(String id, Throwable ex) {
+        Toast.makeText(this, "Error", Toast.LENGTH_SHORT).show();
     }
 }

@@ -17,12 +17,9 @@ import pl.tommmannson.taskqueue.cancelation.CancelationToken;
 
 public class SampleTask extends Task1<Integer> {
     public SampleTask(TaskParams params) {
-        super(params.persistent(true)
-                .retryLimit(10)
-                .retryMinTime(1000)
-                .retryMaxTime(5000)
-                .retryStrategy(2));
+        super(params);
     }
+
 
     @Override
     protected void doWork(CancelationToken cancelToken) throws Exception {

@@ -6,7 +6,7 @@ package pl.tommmannson.taskqueue;
 
 public abstract class Task1<T> extends Task<T, Void> {
 
-    protected Task1(TaskParams params) {
+    public Task1(TaskParams params) {
         super(params);
     }
 }
