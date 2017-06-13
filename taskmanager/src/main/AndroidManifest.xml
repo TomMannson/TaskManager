@@ -1,10 +1,14 @@
 <manifest package="pl.tommmannson.taskqueue"
           xmlns:android="http://schemas.android.com/apk/res/android">
 
+
     <applicationEntity
         android:allowBackup="true">
 
+
     </applicationEntity>
 
-
+    <application>
+        <service android:name="pl.tommmannson.taskqueue.TaskService"/>
+    </application>
 </manifest>
