@@ -59,7 +59,7 @@ public class TaskManager {
     }
 
     public <T extends Task> TaskBuilder<T> build(Class<T> clazz) {
-        return (TaskBuilder<T>) new TaskBuilder<T>(clazz).manager(this);
+        return new TaskBuilder<T>(clazz).manager(this);
     }
 
     public void start(Context context) {

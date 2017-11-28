@@ -7,6 +7,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Toast;
 
+import pl.tommmannson.taskqueue.LifeCycle;
+import pl.tommmannson.taskqueue.LifeCycleImpl;
 import pl.tommmannson.taskqueue.Task;
 import pl.tommmannson.taskqueue.TaskManager;
 import pl.tommmannson.taskqueue.TaskParams;
@@ -21,6 +23,7 @@ public class MainActivity extends AppCompatActivity implements OnManagerReadyLis
     SampleTask task = null;
     TaskManager manager;
     private SampleTask2 task2;
+    LifeCycle life = new LifeCycleImpl();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,10 +54,8 @@ public class MainActivity extends AppCompatActivity implements OnManagerReadyLis
     protected void onStop() {
         super.onStop();
         manager.unregisterMessageQueueReady(this);
-        if (task != null)
-            task.unregisterPartial(intCallback, this);
-        if (task2 != null)
-            task2.unregisterPartial(stringCallback, this);
+        life.stopObserveTaskP(task, intCallback, this);
+        life.stopObserveTaskP(task2, stringCallback, this);
     }
 
     @Override
@@ -67,8 +68,8 @@ public class MainActivity extends AppCompatActivity implements OnManagerReadyLis
                 .id(downloadItemsRequest2)
                 .getOrCreate();
 
-        task.registerPartial(intCallback, this);
-        task2.registerPartial(stringCallback, this);
+        life.observeTaskP(task, intCallback, this);
+        life.observeTaskP(task2, stringCallback, this);
     }
 
     ResultCallback<Integer> intCallback = new ResultCallback<Integer>() {

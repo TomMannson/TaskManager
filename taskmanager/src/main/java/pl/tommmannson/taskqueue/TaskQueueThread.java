@@ -119,11 +119,12 @@ public class TaskQueueThread implements Bootable, TaskManagementInterface {
                     }
 
                     request.setExecutionStatus(TaskStatus.FailFinished);
-                    request.recycle();
+
 
                 }
             } finally {
                 if (request != null) {
+                    request.recycle();
                     request.detachProgressManager();
                     serializer.persist(concurrentTaskQueue, request);
                 }

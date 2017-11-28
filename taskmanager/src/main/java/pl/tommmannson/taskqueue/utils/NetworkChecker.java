@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.support.annotation.RequiresPermission;
 //import android.support.annotation.RequiresPermission;
 
 /**
@@ -11,7 +12,7 @@ import android.net.NetworkInfo;
  */
 public class NetworkChecker {
 
-//    @RequiresPermission(Manifest.permission.ACCESS_NETWORK_STATE)
+    @RequiresPermission(Manifest.permission.ACCESS_NETWORK_STATE)
     public static boolean hasNetworkConnection(Context context) {
         ConnectivityManager manager =
                 (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
