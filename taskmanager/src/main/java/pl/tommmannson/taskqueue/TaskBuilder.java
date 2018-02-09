@@ -19,7 +19,7 @@ public class TaskBuilder<T extends Task> {
         this.taskClass = taskClass;
     }
 
-    public TaskBuilder<T> manager(TaskManager manager) {
+    TaskBuilder<T> manager(TaskManager manager) {
         this.manager = manager;
         return this;
     }

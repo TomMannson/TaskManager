@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.ServiceConnection;
 import android.os.IBinder;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,6 +18,7 @@ import pl.tommmannson.taskqueue.messaging.impl.BootServiceMessage;
 import pl.tommmannson.taskqueue.messaging.impl.CancelTaskMessage;
 import pl.tommmannson.taskqueue.messaging.impl.RegisterCallbackMessage;
 import pl.tommmannson.taskqueue.messaging.impl.UnregisterCallbackMessage;
+import pl.tommmannson.taskqueue.persistence.Serializer;
 import pl.tommmannson.taskqueue.progress.OnManagerReadyListener;
 import pl.tommmannson.taskqueue.progress.QueueReadyNotifer;
 import pl.tommmannson.taskqueue.progress.TaskCallback;
@@ -37,7 +39,7 @@ public class TaskManager {
     QueueReadyNotifer notifier = new QueueReadyNotifer(this);
     private int id;
 
-    public TaskManager(TaskManagerConfiguration config) {
+    TaskManager(TaskManagerConfiguration config) {
         messageDispatcher = new MessageDispather(factory);
 
         if (config == null) {
@@ -70,7 +72,7 @@ public class TaskManager {
         messageDispatcher.dispatch(message);
     }
 
-    public <T> void doTask(final Task<T, ?> task) {
+    public <T extends Serializable> void doTask(final Task<T, ?> task) {
 
         if (task == null)
             return;
@@ -105,7 +107,7 @@ public class TaskManager {
         messageDispatcher.dispatch(message);
     }
 
-    public <T> void cancelRequest(final Task<T, ?> task) {
+    public <T extends Serializable> void cancelRequest(final Task<T, ?> task) {
 
         if (task == null)
             return;
@@ -167,7 +169,7 @@ public class TaskManager {
         }
     }
 
-    public static TaskManager createInstance(int id, TaskManagerConfiguration config) {
+    public static void createInstance(int id, TaskManagerConfiguration config) {
 
         TaskManager manager = instances.get(id);
 
@@ -178,7 +180,7 @@ public class TaskManager {
         }
 
         manager.start(config.getContext());
-        return manager;
+//        return manager;
     }
 
     public static TaskManager getInstance(int id) {

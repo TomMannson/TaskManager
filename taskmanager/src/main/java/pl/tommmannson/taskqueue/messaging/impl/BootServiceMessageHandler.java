@@ -5,6 +5,7 @@ import android.content.Intent;
 
 import pl.tommmannson.taskqueue.TaskManager;
 import pl.tommmannson.taskqueue.TaskQueueThread;
+import pl.tommmannson.taskqueue.TaskThread;
 import pl.tommmannson.taskqueue.config.TaskManagerConfiguration;
 import pl.tommmannson.taskqueue.messaging.MessageHandler;
 
@@ -19,7 +20,15 @@ public class BootServiceMessageHandler implements MessageHandler<BootServiceMess
         TaskManager manager = message.getTaskManager();
         TaskManagerConfiguration configuration = message.getConfig();
 
-        if (configuration.isThreadPoolMode()) {
+        if (configuration.isJobDispatherMode()) {
+            TaskThread service = new TaskThread(message.getAppContext());
+            service.configure(configuration);
+            service.setQueueId(manager.getId());
+            service.start();
+
+            manager.setService(service);
+        }
+        else if (configuration.isThreadPoolMode()) {
             TaskQueueThread service = new TaskQueueThread(message.getAppContext());
 
             service.configure(configuration);
@@ -28,6 +37,8 @@ public class BootServiceMessageHandler implements MessageHandler<BootServiceMess
 
             manager.setService(service);
 //            messageDispatcher.dispatch();
+        }
+        if (configuration.isJobDispatherMode()) {
         } else {
 
             if (!tryToStartService(message)) {

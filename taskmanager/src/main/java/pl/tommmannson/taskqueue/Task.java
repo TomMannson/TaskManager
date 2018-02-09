@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import pl.tommmannson.taskqueue.cancelation.CancelationToken;
+import pl.tommmannson.taskqueue.persistence.Serializer;
 import pl.tommmannson.taskqueue.progress.ErrorCallback;
 import pl.tommmannson.taskqueue.progress.ResultCallback;
 import pl.tommmannson.taskqueue.progress.TaskCallbackWrapper;
@@ -24,7 +25,7 @@ import pl.tommmannson.taskqueue.scheduler.RetrySchedulerFactory;
 /**
  * Created by Tomasz Król on 2015-11-13.
  */
-public abstract class Task<T, Progress> implements Serializable {
+public abstract class Task<T extends Serializable, Progress> implements Serializable {
 
 
     private String id;
@@ -109,6 +110,10 @@ public abstract class Task<T, Progress> implements Serializable {
 //    @NonNull
     public String getId() {
         return id;
+    }
+
+    public int getManagerId(){
+        return taskmanager.getId();
     }
 
     public void setId(String uuid) {

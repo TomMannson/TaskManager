@@ -3,6 +3,7 @@ package pl.tommmannson.taskqueue;
 import android.content.Context;
 import android.util.Log;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

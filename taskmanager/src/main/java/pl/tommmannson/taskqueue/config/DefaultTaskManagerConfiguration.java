@@ -10,6 +10,6 @@ import pl.tommmannson.taskqueue.TaskService;
  */
 public class DefaultTaskManagerConfiguration extends TaskManagerConfiguration {
     public DefaultTaskManagerConfiguration(Context ctx) {
-        super(null, null, 3, 1, true, ctx);
+        super(null, null, 3, 1, true, true,ctx);
     }
 }

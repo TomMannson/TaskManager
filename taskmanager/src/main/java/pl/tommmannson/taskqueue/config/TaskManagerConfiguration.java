@@ -2,6 +2,7 @@ package pl.tommmannson.taskqueue.config;
 
 
 import android.content.Context;
+import android.os.Build;
 //import android.support.annotation.IntDef;
 
 import java.lang.annotation.Retention;
@@ -25,19 +26,21 @@ public class TaskManagerConfiguration {
     int taskMethodSerialisation;
     boolean threadPoolMode;
     private boolean logging;
+    private boolean jobDispatherMode;
 
     TaskManagerConfiguration(Class<? extends TaskService> classOfService, DependencyInjector injector, int maxWorkerCount,
                              int taskMethodSerialisation, Context ctx) {
-        this(classOfService, injector, maxWorkerCount, taskMethodSerialisation, false, ctx);
+        this(classOfService, injector, maxWorkerCount, taskMethodSerialisation, false, true,ctx);
     }
 
     TaskManagerConfiguration(Class<? extends TaskService> classOfService, DependencyInjector injector, int maxWorkerCount,
-                             int taskMethodSerialisation, boolean threadPoolMode, Context ctx) {
+                             int taskMethodSerialisation, boolean threadPoolMode, boolean jobDispatherMode, Context ctx) {
         this.classOfService = classOfService;
         this.injector = injector;
         this.maxWorkerCount = maxWorkerCount;
         this.taskMethodSerialisation = taskMethodSerialisation;
         this.threadPoolMode = threadPoolMode;
+        this.jobDispatherMode = jobDispatherMode;
         this.ctx = ctx;
     }
 
@@ -55,6 +58,10 @@ public class TaskManagerConfiguration {
 
     public boolean isThreadPoolMode() {
         return threadPoolMode;
+    }
+
+    public boolean isJobDispatherMode() {
+        return jobDispatherMode;
     }
 
     public boolean getLogging() {
@@ -117,8 +124,10 @@ public class TaskManagerConfiguration {
                 throw new IllegalStateException("maxWorkerCount should be greather then 0");
             }
 
+            boolean jobDispather = android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP;
+
             return new TaskManagerConfiguration(classOfService, injector, maxWorkerCount, taskMethodSerialisation,
-                    threadPoolMode, ctx);
+                    threadPoolMode, jobDispather, ctx);
         }
     }
 

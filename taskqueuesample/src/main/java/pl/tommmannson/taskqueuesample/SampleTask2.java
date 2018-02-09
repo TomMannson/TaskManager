@@ -20,6 +20,7 @@ public class SampleTask2 extends Task1<String> {
     @Override
     protected void doWork(CancelationToken cancelToken) throws Exception {
         Log.e(SampleTask2.class.getSimpleName(), "finished");
+        Thread.sleep(1000);
         notifyResult("asdasd");
     }
 }

@@ -8,7 +8,7 @@ import pl.tommmannson.taskqueue.TaskResult;
  * Created by tomasz.krol on 2017-04-12.
  */
 
-public class TaskState<T> implements Serializable {
+public class TaskState<T extends Serializable> implements Serializable {
 
     TaskStatus status = TaskStatus.NotExistsInQueue;
     T result = null;

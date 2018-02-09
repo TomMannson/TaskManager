@@ -1,13 +1,16 @@
 package pl.tommmannson.taskqueue.progress;
 
+import java.io.Serializable;
+
 import pl.tommmannson.taskqueue.Task;
 import pl.tommmannson.taskqueue.TaskResult;
+import pl.tommmannson.taskqueue.persistence.Serializer;
 
 /**
  * Created by tomasz.krol on 2017-06-13.
  */
 
-public class TaskCallbackWrapper<Result, Progress> implements TaskCallback<Result, Progress> {
+public class TaskCallbackWrapper<Result extends Serializable, Progress> implements TaskCallback<Result, Progress> {
 
     private ResultCallback<Result> resultListener;
     private ProgressCallback<Progress> progressListener;

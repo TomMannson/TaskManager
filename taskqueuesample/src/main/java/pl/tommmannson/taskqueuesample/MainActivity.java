@@ -42,6 +42,15 @@ public class MainActivity extends AppCompatActivity implements OnManagerReadyLis
                 task.run();
             }
         });
+
+        FloatingActionButton fab2 = (FloatingActionButton) findViewById(R.id.fab2);
+        fab2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                task2.run();
+            }
+        });
     }
 
     @Override

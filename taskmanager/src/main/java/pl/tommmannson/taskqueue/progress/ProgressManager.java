@@ -4,16 +4,18 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 
+import java.io.Serializable;
 import java.util.List;
 
 import pl.tommmannson.taskqueue.Task;
 import pl.tommmannson.taskqueue.TaskResult;
+import pl.tommmannson.taskqueue.persistence.Serializer;
 import pl.tommmannson.taskqueue.persistence.TaskState;
 
 /**
  * Created by tomasz.krol on 2016-01-29.
  */
-public class ProgressManager<Result, Progress> {
+public class ProgressManager<Result extends Serializable, Progress> {
 
     List<TaskCallback<Result, Progress>> callbacks = null;
     Handler handler = new Handler(Looper.getMainLooper());
