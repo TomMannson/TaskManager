@@ -33,7 +33,7 @@ public class Bootstraper {
             if(task.getRetryState().getRetryLimit() > 0){
                 continue;
             }
-            if (TaskStatusHelper.taskAfterExecution(task.getState().getStatus()) ||
+            if (TaskStatusHelper.taskAfterExecution(task) ||
                     task.getState().getStatus() == TaskStatus.Canceled) {
                 concurrentTaskQueue.removeWaiting(task);
             }

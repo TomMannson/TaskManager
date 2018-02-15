@@ -239,6 +239,19 @@ public class TaskQueueThread implements Bootable, TaskManagementInterface {
     }
 
     @Override
+    public void removeRequest(Task<?, ?> task) {
+        if (concurrentTaskQueue.removeWaiting(task) || concurrentTaskQueue.removeProcessing(task)) {
+
+            serializer.remove(concurrentTaskQueue, task);
+            task.setExecutionStatus(TaskStatus.NotExistsInQueue);
+
+            if (workerThreadPool.getActiveCount() < workerThreadCount) {
+                workerThreadPool.execute(this);
+            }
+        }
+    }
+
+    @Override
     public Serializer getSerializer() {
         return serializer;
     }

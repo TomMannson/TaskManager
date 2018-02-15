@@ -47,6 +47,26 @@ public class FileSerializer implements Serializer {
         }
     }
 
+    public synchronized void remove(TaskQueue queue, Task taskToPersist) {
+
+        try {
+            FileOutputStream fileOut =
+                    new FileOutputStream(new File(pathToHoldSavedTasks));
+            ObjectOutputStream out = new ObjectOutputStream(fileOut);
+            List<Task<?, ?>> listToWrite = new ArrayList<>();
+            for (Task<?, ?> task: queue.getFullList()) {
+                if(task.isPersistent()) {
+                    listToWrite.add(task);
+                }
+            }
+            out.writeObject(listToWrite);
+            out.close();
+
+        } catch (IOException ex) {
+            ex.toString();
+        }
+    }
+
     public synchronized void restore(final TaskQueue queue) {
         try {
             FileInputStream fileOut =

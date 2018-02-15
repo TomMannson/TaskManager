@@ -71,6 +71,7 @@ public class MainActivity extends AppCompatActivity implements OnManagerReadyLis
     public void onTaskManagerReady(long id) {
         task = manager.build(SampleTask.class)
                 .id(downloadItemsRequest)
+                .params(new TaskParams().persistent(true))
                 .getOrCreate();
 
         task2 = manager.build(SampleTask2.class)

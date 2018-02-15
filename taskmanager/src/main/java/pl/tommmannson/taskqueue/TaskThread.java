@@ -30,6 +30,8 @@ import pl.tommmannson.taskqueue.persistence.sqlite.SqlSerializer;
 import pl.tommmannson.taskqueue.progress.TaskCallback;
 import pl.tommmannson.taskqueue.queues.TaskQueue;
 
+import static android.app.job.JobInfo.NETWORK_TYPE_ANY;
+
 /**
  * Created by tomasz.krol on 2016-12-06.
  */
@@ -84,7 +86,7 @@ public class TaskThread implements Bootable, TaskManagementInterface {
 
         JobInfo job = new JobInfo.Builder(task.getId().hashCode(), new ComponentName(ctx, TaskServiceCreator.class))
                 .setExtras(bundle)
-                .setRequiresCharging(true)
+                .setRequiredNetworkType(NETWORK_TYPE_ANY)
                 .setOverrideDeadline(10000)
 //                .setTag()
 //                .setService(TaskServiceCreator.class)

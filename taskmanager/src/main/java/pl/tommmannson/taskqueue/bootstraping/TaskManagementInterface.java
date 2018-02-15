@@ -28,4 +28,6 @@ public interface TaskManagementInterface {
     void setQueueId(int queueId);
 
     void addTaskToTracking(Task task);
+
+    void removeRequest(Task<?, ?> task);
 }

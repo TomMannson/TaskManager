@@ -23,12 +23,7 @@ public class SampleTask extends Task1<Integer> {
 
     @Override
     protected void doWork(CancelationToken cancelToken) throws Exception {
-        Log.e(SampleTask.class.getSimpleName(), "finished");
         Thread.sleep(4000);
         notifyResult(1);
-//        notifyError(new InvalidClassException("asd"));
-//        SampleTask2 task2 = new SampleTask2();
-//        task2.setId("secondTask");
-//        task2.run(1);
     }
 }

@@ -33,7 +33,7 @@ public class SqlSerializer implements Serializer {
     @Override
     public void persist(TaskQueue queue, Task taskToPersist) {
 
-        if(!taskToPersist.isPersistent()){
+        if (!taskToPersist.isPersistent()) {
             return;
         }
 
@@ -59,9 +59,25 @@ public class SqlSerializer implements Serializer {
         }
     }
 
+    @Override
+    public void remove(TaskQueue queue, Task taskToPersist) {
+        if (!taskToPersist.isPersistent()) {
+            return;
+        }
+
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        deleteTaskInDB(taskToPersist, db);
+    }
+
     private int editTaskInDB(Task taskToPersist, SQLiteDatabase db, ContentValues value) {
         return db.update(TaskDbContract.TaskTable.TABLE_NAME,
                 value, TaskDbContract.TaskTable.ID_COLUMN + "=?",
+                new String[]{taskToPersist.getId()});
+    }
+
+    private int deleteTaskInDB(Task taskToPersist, SQLiteDatabase db) {
+        return db.delete(TaskDbContract.TaskTable.TABLE_NAME,
+                TaskDbContract.TaskTable.ID_COLUMN + "=?",
                 new String[]{taskToPersist.getId()});
     }
 

@@ -9,6 +9,8 @@ import pl.tommmannson.taskqueue.messaging.impl.BootServiceMessage;
 import pl.tommmannson.taskqueue.messaging.impl.BootServiceMessageHandler;
 import pl.tommmannson.taskqueue.messaging.impl.CancelTaskMessage;
 import pl.tommmannson.taskqueue.messaging.impl.CancelTaskMessageHandler;
+import pl.tommmannson.taskqueue.messaging.impl.DeleteTaskMessage;
+import pl.tommmannson.taskqueue.messaging.impl.DeleteTaskMessageHandler;
 import pl.tommmannson.taskqueue.messaging.impl.RegisterCallbackMessage;
 import pl.tommmannson.taskqueue.messaging.impl.RegisterCallbackMessageHandler;
 import pl.tommmannson.taskqueue.messaging.impl.UnregisterCallbackMessage;
@@ -31,6 +33,7 @@ public class MessageDispather {
         map.put(RegisterCallbackMessage.class, new RegisterCallbackMessageHandler());
         map.put(UnregisterCallbackMessage.class, new UnregisterCallbackMessageHandler());
         map.put(CancelTaskMessage.class, new CancelTaskMessageHandler());
+        map.put(DeleteTaskMessage.class, new DeleteTaskMessageHandler());
     }
 
     public MessageDispather(MessageFactory factory){

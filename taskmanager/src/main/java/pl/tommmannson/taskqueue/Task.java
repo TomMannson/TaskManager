@@ -64,6 +64,10 @@ public abstract class Task<T extends Serializable, Progress> implements Serializ
         taskmanager.cancelRequest(this);
     }
 
+//    public void delete() {
+//        taskmanager.remove(this);
+//    }
+
     public void register(final TaskCallback<T, Progress> callback){
         taskmanager.registerCallback(getId(), callback);
     }

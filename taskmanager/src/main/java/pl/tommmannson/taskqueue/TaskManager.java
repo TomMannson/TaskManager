@@ -146,6 +146,9 @@ public class TaskManager {
         service.addTaskToTracking(task);
     }
 
+    public <T extends Serializable, Progress> void remove(Task<T, Progress> tProgressTask) {
+    }
+
     public class RequestServiceConnection implements ServiceConnection {
 
         @Override

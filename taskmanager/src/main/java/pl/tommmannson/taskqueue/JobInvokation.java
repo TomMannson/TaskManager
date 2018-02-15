@@ -1,8 +1,10 @@
 package pl.tommmannson.taskqueue;
 
 
+import android.annotation.TargetApi;
 import android.app.job.JobParameters;
 import android.app.job.JobService;
+import android.os.Build;
 import android.util.Log;
 
 import java.util.HashMap;
@@ -20,14 +22,14 @@ import pl.tommmannson.taskqueue.progress.TaskCallback;
 /**
  * Created by tomasz.krol on 2018-02-08.
  */
-
+@TargetApi(Build.VERSION_CODES.LOLLIPOP)
 public class JobInvokation implements Runnable {
 
     private Map<String, List<TaskCallback>> callbacks = new HashMap<>();
     private Map<Task<?, ?>, CancelationToken> cancelation = new HashMap<>();
     private Map<String, Task<?, ?>> tasks = new HashMap<>();
     private Serializer serializer;
-    DependencyInjector injector = null;
+    private DependencyInjector injector = null;
 
     private final JobParameters job;
     private JobService service;
@@ -62,6 +64,7 @@ public class JobInvokation implements Runnable {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void run() {
         Task request = null;
         try {
@@ -126,6 +129,7 @@ public class JobInvokation implements Runnable {
         }
     }
 
+    @SuppressWarnings("unchecked")
     private void performTaskWork(Task request) throws Exception {
         CancelationToken token = cancelation.get(request);
         if (token == null) {
@@ -149,11 +153,7 @@ public class JobInvokation implements Runnable {
         request.setExecutionStatus(TaskStatus.SuccessfullyFinished);
     }
 
-    public boolean performErrorHandling() {
-        return false;
-    }
-
-    public void init(Map<String, Task<?, ?>> tasks, Map<String, List<TaskCallback>> callbacks, Map<Task<?, ?>, CancelationToken> cancelation, DependencyInjector injector, Serializer serializer) {
+    void init(Map<String, Task<?, ?>> tasks, Map<String, List<TaskCallback>> callbacks, Map<Task<?, ?>, CancelationToken> cancelation, DependencyInjector injector, Serializer serializer) {
 
         this.tasks = tasks;
         this.callbacks = callbacks;
