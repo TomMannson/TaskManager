@@ -1,5 +1,6 @@
 package pl.tommmannson.taskqueue;
 
+import android.app.job.JobInfo;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.ServiceConnection;
@@ -72,7 +73,7 @@ public class TaskManager {
         messageDispatcher.dispatch(message);
     }
 
-    public <T extends Serializable> void doTask(final Task<T, ?> task) {
+    <T extends Serializable> void doTask(final Task<T, ?> task, Object... data) {
 
         if (task == null)
             return;
@@ -80,6 +81,7 @@ public class TaskManager {
         AddTaskMessage message = factory.obtain(AddTaskMessage.class);
         message.setTask(task);
         message.setTaskManager(this);
+        message.setData(data);
         messageDispatcher.dispatch(message);
     }
 
@@ -107,7 +109,7 @@ public class TaskManager {
         messageDispatcher.dispatch(message);
     }
 
-    public <T extends Serializable> void cancelRequest(final Task<T, ?> task) {
+    <T extends Serializable> void cancelRequest(final Task<T, ?> task) {
 
         if (task == null)
             return;
@@ -142,7 +144,7 @@ public class TaskManager {
         return id;
     }
 
-    public void addTask(Task task) {
+    void addTask(Task task) {
         service.addTaskToTracking(task);
     }
 

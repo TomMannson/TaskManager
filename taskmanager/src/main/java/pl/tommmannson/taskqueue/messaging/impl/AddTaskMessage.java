@@ -10,11 +10,8 @@ import pl.tommmannson.taskqueue.TaskManager;
 
 public class AddTaskMessage extends AbsMessage {
 
-    public AddTaskMessage() {
-        super(2);
-    }
-
     Task<?, ?> task;
+    Object[] data;
 
     public Task<?, ?> getTask() {
         return task;
@@ -22,5 +19,9 @@ public class AddTaskMessage extends AbsMessage {
 
     public void setTask(Task<?, ?> task) {
         this.task = task;
+    }
+
+    public void setData(Object[] data) {
+        this.data = data;
     }
 }

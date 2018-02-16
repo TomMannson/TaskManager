@@ -37,15 +37,15 @@ import static android.app.job.JobInfo.NETWORK_TYPE_ANY;
  */
 
 @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-public class TaskThread implements Bootable, TaskManagementInterface {
+public class TaskShedulerThread implements Bootable, TaskManagementInterface {
 
-    static public final Class<?> TAG = TaskThread.class;
+    static public final Class<?> TAG = TaskShedulerThread.class;
     private final Context ctx;
 
     private Map<String, List<TaskCallback>> callbacks = new HashMap<>();
     final private Map<Task<?, ?>, CancelationToken> cancelation = new HashMap<>();
     final private Map<String, Task<?, ?>> tasks = new HashMap<>();
-    //    private TaskQueue concurrentTaskQueue = null;
+
     private Serializer serializer;
     private JobScheduler dispather;
 
@@ -55,7 +55,7 @@ public class TaskThread implements Bootable, TaskManagementInterface {
     private boolean tasksLoadedFlag;
     private int serialisationType;
 
-    public TaskThread(Context ctx) {
+    public TaskShedulerThread(Context ctx) {
         this.ctx = ctx;
         this.dispather = (JobScheduler) ctx.getSystemService(Context.JOB_SCHEDULER_SERVICE);
     }
@@ -78,25 +78,20 @@ public class TaskThread implements Bootable, TaskManagementInterface {
 
     }
 
-    public void addRequest(Task<?, ?> task) {
+    public void addRequest(Task<?, ?> task, Object... data) {
 
-        PersistableBundle bundle = new PersistableBundle();
+        if (!(data != null && data.length != 0)) {
+            throw new IllegalStateException("job can't be null");
+        }
+
+        JobInfo.Builder jobBuilder = (JobInfo.Builder) data[0];
+        JobInfo info = jobBuilder.build();
+
+        PersistableBundle bundle = info.getExtras();
         bundle.putString("TAG", task.getId());
         bundle.putInt("MANAGER_ID", task.getManagerId());
 
-        JobInfo job = new JobInfo.Builder(task.getId().hashCode(), new ComponentName(ctx, TaskServiceCreator.class))
-                .setExtras(bundle)
-                .setRequiredNetworkType(NETWORK_TYPE_ANY)
-                .setOverrideDeadline(10000)
-//                .setTag()
-//                .setService(TaskServiceCreator.class)
-//                .setLifetime(Lifetime.UNTIL_NEXT_BOOT)
-                // start between 0 and 60 seconds from now
-//                .setTrigger(Trigger.executionWindow(0, 10))
-//                .setReplaceCurrent(true)
-                .build();
-
-        dispather.schedule(job);
+        dispather.schedule(info);
         tasks.put(task.getId(), task);
         task.setExecutionStatus(TaskStatus.AddedToQueue);
         serializer.persist(null, task);
@@ -169,6 +164,11 @@ public class TaskThread implements Bootable, TaskManagementInterface {
     //    @Override
     public void addTaskToTracking(Task task) {
         tasks.put(task.getId(), task);
+    }
+
+    @Override
+    public void removeRequest(Task<?, ?> task) {
+
     }
 
     //    @Override

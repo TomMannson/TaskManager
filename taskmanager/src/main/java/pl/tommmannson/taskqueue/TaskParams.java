@@ -7,11 +7,11 @@ import pl.tommmannson.taskqueue.scheduler.impl.NoneRetryControler;
 /**
  * Created by tomasz.krol on 2016-05-06.
  */
-public class TaskParams {
+public class TaskParams implements Cloneable {
 
-    private String groupId = null;
-    private boolean persistent = false;
-    private int priority = 0;
+    protected String groupId = null;
+    protected boolean persistent = false;
+    protected int priority = 0;
     private RetryConfig retryConfig = new RetryConfig();
 
     public String getGroupId() {

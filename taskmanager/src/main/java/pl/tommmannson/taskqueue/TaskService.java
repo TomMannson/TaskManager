@@ -56,7 +56,7 @@ public class TaskService extends Service implements TaskManagementInterface{
     }
 
     @Override
-    public void addRequest(Task<?, ?> task) {
+    public void addRequest(Task<?, ?> task, Object... data) {
 
         taskQueueThread.addRequest(task);
     }
@@ -102,6 +102,11 @@ public class TaskService extends Service implements TaskManagementInterface{
     @Override
     public void addTaskToTracking(Task task) {
         taskQueueThread.addTaskToTracking(task);
+    }
+
+    @Override
+    public void removeRequest(Task<?, ?> task) {
+        taskQueueThread.removeRequest(task);
     }
 
     public static class RequestBinder extends Binder {

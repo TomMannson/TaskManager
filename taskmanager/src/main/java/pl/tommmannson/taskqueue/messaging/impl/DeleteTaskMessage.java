@@ -9,10 +9,6 @@ import pl.tommmannson.taskqueue.Task;
 
 public class DeleteTaskMessage extends AbsMessage {
 
-    public DeleteTaskMessage() {
-        super(2);
-    }
-
     Task<?, ?> task;
 
     public Task<?, ?> getTask() {

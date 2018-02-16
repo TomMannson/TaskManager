@@ -15,10 +15,6 @@ public class BootServiceMessage extends AbsMessage {
     private TaskManagerConfiguration config;
     private Context appContext;
 
-    public BootServiceMessage() {
-        super(0);
-    }
-
     public TaskManagerConfiguration getConfig() {
         return config;
     }

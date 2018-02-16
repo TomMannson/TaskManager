@@ -11,10 +11,6 @@ import pl.tommmannson.taskqueue.progress.TaskCallback;
 
 public class UnregisterCallbackMessage extends AbsMessage {
 
-    public UnregisterCallbackMessage() {
-        super(5);
-    }
-
     String taskId;
     TaskCallback taskCallback;
 

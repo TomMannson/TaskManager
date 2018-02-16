@@ -2,15 +2,12 @@ package pl.tommmannson.taskqueue.messaging.impl;
 
 import pl.tommmannson.taskqueue.AbsMessage;
 import pl.tommmannson.taskqueue.Task;
-import pl.tommmannson.taskqueue.TaskManager;
-import pl.tommmannson.taskqueue.bootstraping.TaskManagementInterface;
-import pl.tommmannson.taskqueue.messaging.Message;
 
 /**
- * Created by tomasz.krol on 2017-03-06.
+ * Created by tomasz.krol on 2016-12-06.
  */
 
-public class CancelTaskMessage extends AbsMessage {
+public class ScheduleTaskMessage extends AbsMessage {
 
     Task<?, ?> task;
 

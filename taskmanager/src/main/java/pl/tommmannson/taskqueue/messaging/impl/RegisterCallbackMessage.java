@@ -11,10 +11,6 @@ import pl.tommmannson.taskqueue.progress.TaskCallback;
 
 public class RegisterCallbackMessage extends AbsMessage {
 
-    public RegisterCallbackMessage() {
-        super(3);
-    }
-
     String taskId;
     TaskCallback taskCallback;
 

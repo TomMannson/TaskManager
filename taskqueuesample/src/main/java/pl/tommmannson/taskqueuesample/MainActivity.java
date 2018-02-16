@@ -1,5 +1,6 @@
 package pl.tommmannson.taskqueuesample;
 
+import android.app.job.JobInfo;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -12,6 +13,7 @@ import pl.tommmannson.taskqueue.LifeCycleImpl;
 import pl.tommmannson.taskqueue.Task;
 import pl.tommmannson.taskqueue.TaskManager;
 import pl.tommmannson.taskqueue.TaskParams;
+import pl.tommmannson.taskqueue.TaskSheduler;
 import pl.tommmannson.taskqueue.progress.ErrorCallback;
 import pl.tommmannson.taskqueue.progress.OnManagerReadyListener;
 import pl.tommmannson.taskqueue.progress.ResultCallback;
@@ -39,6 +41,7 @@ public class MainActivity extends AppCompatActivity implements OnManagerReadyLis
             @Override
             public void onClick(View view) {
 
+//                JobInfo.Builder builder = TaskSheduler.buildJob(1);
                 task.run();
             }
         });
@@ -48,7 +51,8 @@ public class MainActivity extends AppCompatActivity implements OnManagerReadyLis
             @Override
             public void onClick(View view) {
 
-                task2.run();
+//                JobInfo.Builder builder = TaskSheduler.buildJob(2);
+                task.run();
             }
         });
     }

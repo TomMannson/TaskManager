@@ -3,6 +3,8 @@ package pl.tommmannson.taskqueue;
 
 //import android.support.annotation.NonNull;
 
+import android.app.job.JobInfo;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -58,6 +60,10 @@ public abstract class Task<T extends Serializable, Progress> implements Serializ
 
     public void run() {
         taskmanager.doTask(this);
+    }
+
+    public void schedule(JobInfo.Builder builder) {
+        taskmanager.doTask(this, builder);
     }
 
     public void cancel() {

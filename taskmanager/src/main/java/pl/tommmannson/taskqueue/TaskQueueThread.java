@@ -158,7 +158,7 @@ public class TaskQueueThread implements Bootable, TaskManagementInterface {
         request.setExecutionStatus(TaskStatus.SuccessfullyFinished);
     }
 
-    public void addRequest(Task<?, ?> task) {
+    public void addRequest(Task<?, ?> task, Object... data) {
 
         if (concurrentTaskQueue.pushToQueue(task)) {
             tasks.put(task.getId(), task);

@@ -10,5 +10,11 @@
 
     <application>
         <service android:name="pl.tommmannson.taskqueue.TaskService"/>
+
+        <service
+            android:name="pl.tommmannson.taskqueue.extension.TaskServiceCreator"
+            android:exported="true"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
+
     </application>
 </manifest>

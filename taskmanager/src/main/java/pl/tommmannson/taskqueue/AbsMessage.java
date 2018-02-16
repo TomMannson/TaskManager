@@ -11,16 +11,6 @@ import pl.tommmannson.taskqueue.messaging.Message;
 public abstract class AbsMessage implements Message {
 
     private TaskManager taskManager;
-    private final int type;
-
-    public AbsMessage(int type){
-        this.type = type;
-    }
-
-    @Override
-    public int getType() {
-        return type;
-    }
 
     @Override
     public TaskManagementInterface management() {
