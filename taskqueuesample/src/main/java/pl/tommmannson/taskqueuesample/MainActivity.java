@@ -13,7 +13,7 @@ import pl.tommmannson.taskqueue.LifeCycleImpl;
 import pl.tommmannson.taskqueue.Task;
 import pl.tommmannson.taskqueue.TaskManager;
 import pl.tommmannson.taskqueue.TaskParams;
-import pl.tommmannson.taskqueue.TaskSheduler;
+import pl.tommmannson.taskqueue.TaskScheduler;
 import pl.tommmannson.taskqueue.progress.ErrorCallback;
 import pl.tommmannson.taskqueue.progress.OnManagerReadyListener;
 import pl.tommmannson.taskqueue.progress.ResultCallback;
@@ -24,6 +24,7 @@ public class MainActivity extends AppCompatActivity implements OnManagerReadyLis
     final static String downloadItemsRequest2 = "downloadItemsReques2";
     SampleTask task = null;
     TaskManager manager;
+    TaskScheduler scheduler;
     private SampleTask2 task2;
     LifeCycle life = new LifeCycleImpl();
 
@@ -31,6 +32,7 @@ public class MainActivity extends AppCompatActivity implements OnManagerReadyLis
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         manager = TaskManager.getInstance(1);
+        scheduler = TaskScheduler.getInstance();
 
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -41,7 +43,7 @@ public class MainActivity extends AppCompatActivity implements OnManagerReadyLis
             @Override
             public void onClick(View view) {
 
-//                JobInfo.Builder builder = TaskSheduler.buildJob(1);
+//                JobInfo.Builder builder = TaskScheduler.buildJob(1);
                 task.run();
             }
         });
@@ -51,8 +53,8 @@ public class MainActivity extends AppCompatActivity implements OnManagerReadyLis
             @Override
             public void onClick(View view) {
 
-//                JobInfo.Builder builder = TaskSheduler.buildJob(2);
-                task.run();
+                JobInfo.Builder builder = TaskScheduler.buildJob(2);
+                task2.schedule(builder);
             }
         });
     }
@@ -61,12 +63,14 @@ public class MainActivity extends AppCompatActivity implements OnManagerReadyLis
     protected void onStart() {
         super.onStart();
         manager.registerMessageQueueReady(this);
+        scheduler.registerMessageQueueReady(this);
     }
 
     @Override
     protected void onStop() {
         super.onStop();
         manager.unregisterMessageQueueReady(this);
+        scheduler.unregisterMessageQueueReady(this);
         life.stopObserveTaskP(task, intCallback, this);
         life.stopObserveTaskP(task2, stringCallback, this);
     }
@@ -78,12 +82,13 @@ public class MainActivity extends AppCompatActivity implements OnManagerReadyLis
                 .params(new TaskParams().persistent(true))
                 .getOrCreate();
 
-        task2 = manager.build(SampleTask2.class)
+        task2 = scheduler.build(SampleTask2.class)
                 .id(downloadItemsRequest2)
                 .getOrCreate();
 
-        life.observeTaskP(task, intCallback, this);
+
         life.observeTaskP(task2, stringCallback, this);
+        life.observeTaskP(task, intCallback, this);
     }
 
     ResultCallback<Integer> intCallback = new ResultCallback<Integer>() {

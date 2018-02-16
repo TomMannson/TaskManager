@@ -1,41 +1,28 @@
 package pl.tommmannson.taskqueue;
 
 import android.annotation.TargetApi;
-import android.app.Application;
 import android.app.job.JobInfo;
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.ServiceConnection;
 import android.os.Build;
-import android.os.IBinder;
 
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
 
-import pl.tommmannson.taskqueue.bootstraping.TaskManagementInterface;
 import pl.tommmannson.taskqueue.config.DefaultTaskSchedulerConfiguration;
-import pl.tommmannson.taskqueue.config.TaskManagerConfiguration;
-import pl.tommmannson.taskqueue.config.di.DependencyInjector;
 import pl.tommmannson.taskqueue.extension.TaskServiceCreator;
-import pl.tommmannson.taskqueue.messaging.MessageDispather;
-import pl.tommmannson.taskqueue.messaging.MessageFactory;
-import pl.tommmannson.taskqueue.messaging.impl.AddTaskMessage;
-import pl.tommmannson.taskqueue.messaging.impl.BootServiceMessage;
 import pl.tommmannson.taskqueue.progress.OnManagerReadyListener;
-import pl.tommmannson.taskqueue.progress.QueueReadyNotifer;
 
 /**
  * Created by tomasz.krol on 2016-01-29.
  */
 @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-public class TaskSheduler{
+public class TaskScheduler {
 
-    public static final Class<?> TAG = TaskSheduler.class;
+    public static final Class<?> TAG = TaskScheduler.class;
 
     TaskManager manager = null;
 
-    private TaskSheduler(TaskManager manager) {
+    private TaskScheduler(TaskManager manager) {
         this.manager = manager;
     }
 
@@ -69,10 +56,10 @@ public class TaskSheduler{
         TaskManager.createInstance(-150, new DefaultTaskSchedulerConfiguration(ctx));
     }
 
-    public static TaskSheduler getInstance() {
+    public static TaskScheduler getInstance() {
 
         TaskManager manager = TaskManager.getInstance(-150);
-        return new TaskSheduler(manager);
+        return new TaskScheduler(manager);
     }
 
     public static <T extends Task> JobInfo.Builder buildJob(int jobId)  {

@@ -45,19 +45,24 @@ public class LifeCycleImpl implements LifeCycle {
     @Override
     public <RESULT extends Serializable> void stopObserveTaskP(Task<RESULT, ?> task, ResultCallback<RESULT> result) {
 
-        task.unregisterPartial(result);
+        if(task != null) {
+            task.unregisterPartial(result);
+        }
     }
 
     @Override
     public <RESULT extends Serializable> void stopObserveTaskP(Task<RESULT, ?> task, ResultCallback<RESULT> result, ErrorCallback error) {
 
-        task.unregisterPartial(result, error);
+        if(task != null) {
+            task.unregisterPartial(result, error);
+        }
     }
 
 
     @Override
     public <RESULT extends Serializable, PROGRESS> void stopObserveTask(Task<RESULT, PROGRESS> task, TaskCallback<RESULT, PROGRESS> result) {
-
-        task.unregister(result);
+        if(task != null) {
+            task.unregister(result);
+        }
     }
 }
