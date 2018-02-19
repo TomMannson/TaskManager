@@ -12,7 +12,7 @@ import pl.tommmannson.taskqueue.messaging.Message;
 
 public class CancelTaskMessage extends AbsMessage {
 
-    Task<?, ?> task;
+    private Task<?, ?> task;
 
     public Task<?, ?> getTask() {
         return task;

@@ -12,11 +12,6 @@ public abstract class AbsMessage implements Message {
 
     private TaskManager taskManager;
 
-    @Override
-    public TaskManagementInterface management() {
-        return TaskManager.DEFAULT.service;
-    }
-
     public void setTaskManager(TaskManager taskManager) {
         this.taskManager = taskManager;
     }

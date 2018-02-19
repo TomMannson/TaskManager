@@ -23,7 +23,7 @@ public class BootServiceMessage extends AbsMessage {
         this.config = config;
     }
 
-    public Context getAppContext() {
+    Context getAppContext() {
         return appContext;
     }
 

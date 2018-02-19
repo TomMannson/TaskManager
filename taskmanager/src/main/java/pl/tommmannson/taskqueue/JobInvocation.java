@@ -23,7 +23,6 @@ import pl.tommmannson.taskqueue.progress.TaskCallback;
  * Created by tomasz.krol on 2018-02-08.
  */
 @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-/*hide*/
 public class JobInvocation implements Runnable {
 
     private Map<String, List<TaskCallback>> callbacks = new HashMap<>();
@@ -41,6 +40,7 @@ public class JobInvocation implements Runnable {
         this.job = job;
     }
 
+    @SuppressWarnings("unchecked")
     public void invoke() {
         Task request = null;
         try {
@@ -62,7 +62,7 @@ public class JobInvocation implements Runnable {
 
             if (request != null) {
 
-                request.notifyResult(TaskResult.cancelResult(null));
+                 request.notifyResult(TaskResult.cancelResult(null));
 
                 cancelation.remove(request);
 //                    concurrentTaskQueue.removeProcessing(request);

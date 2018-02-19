@@ -38,10 +38,10 @@ public abstract class Task<T extends Serializable, Progress> implements Serializ
     private long updateTime;
     private String groupId;
     private boolean persistent;
-    RetryControler retry;
+    private RetryControler retry;
     private int priority = 0;
 
-    TaskState<T> state = new TaskState<>();
+    private TaskState<T> state = new TaskState<>();
 
     transient private TaskManager taskmanager;
     transient private ProgressManager<T, Progress> manager;
@@ -51,7 +51,7 @@ public abstract class Task<T extends Serializable, Progress> implements Serializ
         init(params);
     }
 
-    public void init(TaskParams params) {
+    private void init(TaskParams params) {
         RetrySchedulerFactory factory = new RetrySchedulerFactory();
         if (params == null) {
             params = new TaskParams();
@@ -121,7 +121,7 @@ public abstract class Task<T extends Serializable, Progress> implements Serializ
 
     protected abstract void doWork(CancelationToken cancelToken) throws Exception;
 
-    protected void recycle() {
+    void recycle() {
     }
 
 //    @NonNull
@@ -129,7 +129,7 @@ public abstract class Task<T extends Serializable, Progress> implements Serializ
         return id;
     }
 
-    public int getManagerId(){
+    int getManagerId(){
         return taskmanager.getId();
     }
 
@@ -148,20 +148,14 @@ public abstract class Task<T extends Serializable, Progress> implements Serializ
 
     protected void notifyResult(T data) {
         state.setResult(data);//taskResult = data;
-//        manager.postResult(this);
-//        data.setTargetType(this.getClass());
     }
 
     protected void notifyProgress(TaskResult<Progress> progress) {
-//        state.setResult(data);//taskResult = data;
         manager.postProgress(getId(), progress);
-//        data.setTargetType(this.getClass());
     }
 
     void sendResult() {
-//        state.setResult(data);//taskResult = data;
         manager.postResult(this);
-//        data.setTargetType(this.getClass());
     }
 
     protected void notifyError(Throwable ex) {

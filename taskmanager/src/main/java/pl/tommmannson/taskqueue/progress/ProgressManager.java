@@ -17,8 +17,8 @@ import pl.tommmannson.taskqueue.persistence.TaskState;
  */
 public class ProgressManager<Result extends Serializable, Progress> {
 
-    List<TaskCallback<Result, Progress>> callbacks = null;
-    Handler handler = new Handler(Looper.getMainLooper());
+    private List<TaskCallback<Result, Progress>> callbacks = null;
+    private Handler handler = new Handler(Looper.getMainLooper());
 
     public ProgressManager(List<TaskCallback<Result, Progress>> callback) {
         this.callbacks = callback;

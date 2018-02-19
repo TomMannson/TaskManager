@@ -8,6 +8,5 @@ import pl.tommmannson.taskqueue.bootstraping.TaskManagementInterface;
 
 public interface Message {
 
-    public TaskManagementInterface management();
 
 }

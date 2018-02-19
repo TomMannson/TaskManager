@@ -2,7 +2,6 @@ package pl.tommmannson.taskqueue;
 
 import java.io.Serializable;
 
-import pl.tommmannson.taskqueue.persistence.Serializer;
 import pl.tommmannson.taskqueue.persistence.TaskStatus;
 import pl.tommmannson.taskqueue.progress.ErrorCallback;
 import pl.tommmannson.taskqueue.progress.ResultCallback;

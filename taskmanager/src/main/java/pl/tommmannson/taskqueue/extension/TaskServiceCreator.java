@@ -38,18 +38,14 @@ public class TaskServiceCreator extends JobService {
     public boolean onStopJob(JobParameters job) {
 
         TaskManager manager = TaskManager.getInstance(job.getExtras().getInt("MANAGER_ID"));
-        ;
         TaskSchedulerThread tasks = (TaskSchedulerThread) manager.getService();
         if (tasks == null) {
             return true;
         }
         Task task = tasks.findTaskById(job.getExtras().getString("TAG"));
-        if (task == null) {
-            return false;
-        }
+        return task != null &&
+                tasks.createNew(job, this).invokeError();
 
-        return tasks.createNew(job, this)
-                .invokeError();
     }
 
     @NonNull

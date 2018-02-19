@@ -42,6 +42,7 @@ public class TaskBuilder<T extends Task> {
         return task;
     }
 
+    @SuppressWarnings("unchecked")
     public T get() {
         Task task = manager.service.findTaskById(id);
         if (task != null && task.getClass().equals(taskClass)) {

@@ -3,7 +3,6 @@ package pl.tommmannson.taskqueue;
 import android.content.Context;
 import android.util.Log;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -17,7 +16,6 @@ import pl.tommmannson.taskqueue.cancelation.CancelationException;
 import pl.tommmannson.taskqueue.cancelation.CancelationToken;
 import pl.tommmannson.taskqueue.config.TaskManagerConfiguration;
 import pl.tommmannson.taskqueue.config.di.DependencyInjector;
-import pl.tommmannson.taskqueue.scheduler.RetryOperation;
 import pl.tommmannson.taskqueue.persistence.Serializer;
 import pl.tommmannson.taskqueue.persistence.TaskStatus;
 import pl.tommmannson.taskqueue.persistence.serialization.FileSerializer;
@@ -25,12 +23,14 @@ import pl.tommmannson.taskqueue.persistence.sqlite.SqlSerializer;
 import pl.tommmannson.taskqueue.progress.ProgressManager;
 import pl.tommmannson.taskqueue.progress.TaskCallback;
 import pl.tommmannson.taskqueue.queues.TaskQueue;
+import pl.tommmannson.taskqueue.scheduler.RetryOperation;
 
 /**
  * Created by tomasz.krol on 2016-12-06.
  */
 
 public class TaskQueueThread implements Bootable, TaskManagementInterface {
+
 
     static public final Class<?> TAG = TaskQueueThread.class;
     private final Context ctx;
@@ -47,7 +47,7 @@ public class TaskQueueThread implements Bootable, TaskManagementInterface {
     private boolean tasksLoadedFlag;
     private int serialisationType;
 
-    public TaskQueueThread(Context ctx){
+    public TaskQueueThread(Context ctx) {
         this.ctx = ctx;
     }
 
@@ -57,15 +57,15 @@ public class TaskQueueThread implements Bootable, TaskManagementInterface {
 
     @Override
     public void setQueueId(int queueId) {
-        if(serialisationType == TaskManagerConfiguration.FILE_SERIALIZABLE){
+        if (serialisationType == TaskManagerConfiguration.FILE_SERIALIZABLE) {
             serializer = new FileSerializer(ctx, queueId);
-        }
-        else{
+        } else {
             serializer = new SqlSerializer(ctx.getApplicationContext(), queueId);
         }
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void run() {
 
         if (concurrentTaskQueue.hasTasksWaitingForExecution()) {
@@ -109,7 +109,7 @@ public class TaskQueueThread implements Bootable, TaskManagementInterface {
                         concurrentTaskQueue.moveToPending(requestToRetry, new RetryOperation() {
                             @Override
                             public void doOnRetry() {
-                                if(!cancelation.get(requestToRetry).isCanceled()) {
+                                if (!cancelation.get(requestToRetry).isCanceled()) {
                                     workerThreadPool.execute(TaskQueueThread.this);
                                 }
                             }
@@ -135,9 +135,10 @@ public class TaskQueueThread implements Bootable, TaskManagementInterface {
         }
     }
 
+    @SuppressWarnings("unchecked")
     private void performTaskWork(Task request) throws Exception {
         CancelationToken token = cancelation.get(request);
-        if(token == null){
+        if (token == null) {
             token = new CancelationToken();
             cancelation.put(request, token);
         }
@@ -150,7 +151,7 @@ public class TaskQueueThread implements Bootable, TaskManagementInterface {
         }
         request.attachProgressManager(manager);
         request.doWork(token);
-        if(request.getState().getException() != null){
+        if (request.getState().getException() != null) {
             throw request.getState().getException();
         }
         cancelation.remove(request);
@@ -192,9 +193,9 @@ public class TaskQueueThread implements Bootable, TaskManagementInterface {
         concurrentTaskQueue.clear();
     }
 
-    public <T> void registerCallbackForRequest(String requestId, TaskCallback callback) {
+    public void registerCallbackForRequest(String requestId, TaskCallback callback) {
         if (callback != null) {
-            List<TaskCallback> callbacksList = null;
+            List<TaskCallback> callbacksList;
             if (callbacks.containsKey(requestId)) {
                 callbacksList = callbacks.get(requestId);
             } else {
@@ -207,7 +208,7 @@ public class TaskQueueThread implements Bootable, TaskManagementInterface {
         }
     }
 
-    public <T> void unregisterCallbackForRequest(String requestId, TaskCallback callback) {
+    public void unregisterCallbackForRequest(String requestId, TaskCallback callback) {
         List<TaskCallback> listOfcallback = callbacks.get(requestId);
         if (listOfcallback != null) {
             listOfcallback.remove(callback);
@@ -218,11 +219,12 @@ public class TaskQueueThread implements Bootable, TaskManagementInterface {
         return tasks.get(id);
     }
 
+    @SuppressWarnings("unused")
     public Task[] findByIds(String... ids) {
 
         Task[] tasksFound = new Task[ids.length];
 
-        for(int i = 0; i < ids.length; i++){
+        for (int i = 0; i < ids.length; i++) {
             tasksFound[i] = tasks.get(ids[i]);
         }
         return tasksFound;

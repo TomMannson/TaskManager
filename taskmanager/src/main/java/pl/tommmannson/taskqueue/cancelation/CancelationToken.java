@@ -5,13 +5,13 @@ package pl.tommmannson.taskqueue.cancelation;
  */
 public class CancelationToken {
 
-    boolean canceled = false;
+    private boolean canceled = false;
 
     public void cancel(){
         canceled = true;
     }
 
-    public void throwCancelSignal(){
+    private void throwCancelSignal(){
         if(canceled){
             throw new CancelationException();
         }
@@ -19,8 +19,6 @@ public class CancelationToken {
 
     public boolean isCanceled(){
         return canceled;
-//            throw new CancelationException();
-//        }
     }
 
     public void forceCancellation(){

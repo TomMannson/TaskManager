@@ -24,7 +24,7 @@ public class ConcurrentTaskQueue implements TaskQueue {
     private BlockingQueue<Task<?, ?>> uniqueTasks = null;
     private Map<String, Task> pendingTask = null;
 
-    Comparator<? super Task<?, ?>> DEFAULT_TASK_COMPARATOR = new Comparator<Task<?, ?>>() {
+    private Comparator<? super Task<?, ?>> DEFAULT_TASK_COMPARATOR = new Comparator<Task<?, ?>>() {
         @Override
         public int compare(Task lhs, Task rhs) {
             return lhs.getPriority() - rhs.getPriority();

@@ -1,8 +1,6 @@
 package pl.tommmannson.taskqueue;
 
 import pl.tommmannson.taskqueue.scheduler.RetryConfig;
-import pl.tommmannson.taskqueue.scheduler.RetryControler;
-import pl.tommmannson.taskqueue.scheduler.impl.NoneRetryControler;
 
 /**
  * Created by tomasz.krol on 2016-05-06.

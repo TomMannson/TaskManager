@@ -21,7 +21,7 @@ import pl.tommmannson.taskqueue.queues.TaskQueue;
 
 public class FileSerializer implements Serializer {
 
-    public String pathToHoldSavedTasks;
+    private String pathToHoldSavedTasks;
 
     public FileSerializer(Context ctx, int idOfManager) {
         pathToHoldSavedTasks = new File(ctx.getApplicationContext().getFilesDir(), "file_" + idOfManager).getAbsolutePath();
@@ -43,7 +43,7 @@ public class FileSerializer implements Serializer {
             out.close();
 
         } catch (IOException ex) {
-            ex.toString();
+            ex.printStackTrace();
         }
     }
 
@@ -63,7 +63,7 @@ public class FileSerializer implements Serializer {
             out.close();
 
         } catch (IOException ex) {
-            ex.toString();
+            ex.printStackTrace();
         }
     }
 
@@ -74,10 +74,8 @@ public class FileSerializer implements Serializer {
             ObjectInputStream in = new ObjectInputStream(fileOut);
             queue.addFullList((List<Task<?, ?>>) in.readObject());
             fileOut.close();
-        } catch (IOException ex) {
-            ex.toString();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
     }
 }

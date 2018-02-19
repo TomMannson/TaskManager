@@ -10,10 +10,10 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class TaskDbHelper extends SQLiteOpenHelper {
 
-    public static final String DB_NAME = "taskDB";
-    public static final int DB_VERSION = 2;
+    private static final String DB_NAME = "taskDB";
+    private static final int DB_VERSION = 2;
 
-    public TaskDbHelper(Context context) {
+    TaskDbHelper(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
 
     }

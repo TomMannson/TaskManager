@@ -7,8 +7,8 @@ import android.content.Context;
  */
 
 public class SingleSqlHelper {
-    static TaskDbHelper instance;
-    public synchronized static TaskDbHelper getInstance(Context ctx){
+    private static TaskDbHelper instance;
+    synchronized static TaskDbHelper getInstance(Context ctx){
         if(instance == null) {
             instance = new TaskDbHelper(ctx);
         }

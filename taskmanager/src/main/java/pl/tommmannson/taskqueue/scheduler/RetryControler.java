@@ -15,7 +15,7 @@ public abstract class RetryControler implements Serializable {
     public static final int RETRY_STRATEGY_LINEAR = 1;
     public static final int RETRY_STRATEGY_EXP = 2;
 
-    protected final int retryMaxTime;
+    private final int retryMaxTime;
     protected final int retryMinTime;
     private int retryLimit = 0;
     private int retryTime = 100;

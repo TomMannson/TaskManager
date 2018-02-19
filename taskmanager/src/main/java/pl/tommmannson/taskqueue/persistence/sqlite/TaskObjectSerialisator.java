@@ -16,9 +16,9 @@ import pl.tommmannson.taskqueue.Task;
  * Created by Gosia on 2016-11-03.
  */
 
-public class TaskObjectSerialisator {
+class TaskObjectSerialisator {
 
-    public Task createObjectFromCursor(Cursor cursor) {
+    Task createObjectFromCursor(Cursor cursor) {
         Task task = null;
         try {
             byte[] data = cursor.getBlob(cursor.getColumnIndex(TaskDbContract.TaskTable.TASK_DATA_COLUMN));
@@ -31,7 +31,7 @@ public class TaskObjectSerialisator {
         return task;
     }
 
-    public ContentValues createValueFormObject(Task task) throws IOException {
+    ContentValues createValueFormObject(Task task) throws IOException {
 
             if (task != null) {
                 ByteArrayOutputStream bais = new ByteArrayOutputStream();
@@ -48,6 +48,5 @@ public class TaskObjectSerialisator {
             } else {
                 return null;
             }
-
     }
 }

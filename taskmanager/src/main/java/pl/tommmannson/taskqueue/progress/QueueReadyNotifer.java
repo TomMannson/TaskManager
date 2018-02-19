@@ -14,10 +14,10 @@ import pl.tommmannson.taskqueue.TaskManager;
 
 public class QueueReadyNotifer {
 
-    List<OnManagerReadyListener> listeners = new ArrayList<>();
-    Handler mainHandler = new Handler(Looper.getMainLooper());
-    boolean finished;
-    TaskManager manager;
+    private List<OnManagerReadyListener> listeners = new ArrayList<>();
+    private Handler mainHandler = new Handler(Looper.getMainLooper());
+    private boolean finished;
+    private TaskManager manager;
 
     public QueueReadyNotifer(TaskManager manager) {
         this.manager = manager;

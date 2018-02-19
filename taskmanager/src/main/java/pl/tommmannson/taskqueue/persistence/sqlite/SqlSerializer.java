@@ -23,7 +23,7 @@ public class SqlSerializer implements Serializer {
 
     private TaskDbHelper dbHelper;
     private int managerId;
-    TaskObjectSerialisator creator = new TaskObjectSerialisator();
+    private TaskObjectSerialisator creator = new TaskObjectSerialisator();
 
     public SqlSerializer(Context ctx, int managerId) {
         dbHelper = SingleSqlHelper.getInstance(ctx);

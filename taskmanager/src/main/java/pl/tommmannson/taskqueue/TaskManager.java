@@ -1,14 +1,12 @@
 package pl.tommmannson.taskqueue;
 
-import android.app.job.JobInfo;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.ServiceConnection;
 import android.os.IBinder;
+import android.util.SparseArray;
 
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
 
 import pl.tommmannson.taskqueue.bootstraping.TaskManagementInterface;
 import pl.tommmannson.taskqueue.config.TaskManagerConfiguration;
@@ -19,7 +17,6 @@ import pl.tommmannson.taskqueue.messaging.impl.BootServiceMessage;
 import pl.tommmannson.taskqueue.messaging.impl.CancelTaskMessage;
 import pl.tommmannson.taskqueue.messaging.impl.RegisterCallbackMessage;
 import pl.tommmannson.taskqueue.messaging.impl.UnregisterCallbackMessage;
-import pl.tommmannson.taskqueue.persistence.Serializer;
 import pl.tommmannson.taskqueue.progress.OnManagerReadyListener;
 import pl.tommmannson.taskqueue.progress.QueueReadyNotifer;
 import pl.tommmannson.taskqueue.progress.TaskCallback;
@@ -30,7 +27,7 @@ import pl.tommmannson.taskqueue.progress.TaskCallback;
 public class TaskManager {
 
     public static final Class<?> TAG = TaskManager.class;
-    static Map<Integer, TaskManager> instances = new HashMap<>();
+    static SparseArray<TaskManager> instances = new SparseArray<>();
     public static TaskManager DEFAULT;
 
     TaskManagerConfiguration configuration;
@@ -62,7 +59,7 @@ public class TaskManager {
     }
 
     public <T extends Task> TaskBuilder<T> build(Class<T> clazz) {
-        return new TaskBuilder<T>(clazz).manager(this);
+        return new TaskBuilder<>(clazz).manager(this);
     }
 
     public void start(Context context) {
@@ -120,6 +117,8 @@ public class TaskManager {
         messageDispatcher.dispatch(message);
     }
 
+
+    @SuppressWarnings("unused")
     public void cancelAllRequests() {
         if (service != null) {
             service.cancelAll();
@@ -148,7 +147,8 @@ public class TaskManager {
         service.addTaskToTracking(task);
     }
 
-    public <T extends Serializable, Progress> void remove(Task<T, Progress> tProgressTask) {
+    @SuppressWarnings("unused")
+    public <T extends Serializable, Progress> void remove(Task<T, Progress> ProgressTask) {
     }
 
     public class RequestServiceConnection implements ServiceConnection {
@@ -185,13 +185,10 @@ public class TaskManager {
         }
 
         manager.start(config.getContext());
-//        return manager;
     }
 
     public static TaskManager getInstance(int id) {
 
-        TaskManager manager = instances.get(id);
-
-        return manager;
+        return instances.get(id);
     }
 }

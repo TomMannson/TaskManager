@@ -43,12 +43,6 @@ public class TaskScheduler {
         manager.start(context);
     }
 
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    public <T extends Serializable> void scheduleTask(final Task<T, ?> task, JobInfo.Builder job) {
-
-        manager.doTask(task, job);
-    }
-
     public <T extends Serializable, Progress> void remove(Task<T, Progress> tProgressTask) {
     }
 

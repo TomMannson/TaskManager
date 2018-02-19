@@ -10,7 +10,7 @@ import pl.tommmannson.taskqueue.TaskManager;
 
 public class AddTaskMessage extends AbsMessage {
 
-    Task<?, ?> task;
+    private Task<?, ?> task;
     Object[] data;
 
     public Task<?, ?> getTask() {

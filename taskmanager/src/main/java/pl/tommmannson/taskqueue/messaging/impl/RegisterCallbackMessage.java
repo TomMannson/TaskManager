@@ -11,10 +11,10 @@ import pl.tommmannson.taskqueue.progress.TaskCallback;
 
 public class RegisterCallbackMessage extends AbsMessage {
 
-    String taskId;
-    TaskCallback taskCallback;
+    private String taskId;
+    private TaskCallback taskCallback;
 
-    public String getTaskId() {
+    String getTaskId() {
         return taskId;
     }
 
@@ -22,7 +22,7 @@ public class RegisterCallbackMessage extends AbsMessage {
         this.taskId = taskId;
     }
 
-    public TaskCallback getTaskCallback() {
+    TaskCallback getTaskCallback() {
         return taskCallback;
     }
 

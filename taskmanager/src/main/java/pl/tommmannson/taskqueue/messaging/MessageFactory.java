@@ -12,7 +12,7 @@ import java.util.Stack;
 
 public class MessageFactory {
 
-    Map<Class<?>, Stack> cachedMessages = new HashMap<>();
+    private Map<Class<?>, Stack> cachedMessages = new HashMap<>();
 
     public synchronized <T extends Message> T obtain(Class<T> klass) {
 
@@ -42,7 +42,7 @@ public class MessageFactory {
         return null;
     }
 
-    public synchronized <T extends Message> void release(Message message) {
+    synchronized <T extends Message> void release(Message message) {
 
         Stack queue = cachedMessages.get(message.getClass());
         queue.push(message);

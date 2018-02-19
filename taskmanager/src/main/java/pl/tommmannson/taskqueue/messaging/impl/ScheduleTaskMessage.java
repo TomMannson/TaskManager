@@ -9,7 +9,7 @@ import pl.tommmannson.taskqueue.Task;
 
 public class ScheduleTaskMessage extends AbsMessage {
 
-    Task<?, ?> task;
+    private Task<?, ?> task;
 
     public Task<?, ?> getTask() {
         return task;

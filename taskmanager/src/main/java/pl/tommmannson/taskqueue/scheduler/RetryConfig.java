@@ -4,6 +4,7 @@ package pl.tommmannson.taskqueue.scheduler;
  * Created by tomasz.krol on 2017-04-13.
  */
 
+@SuppressWarnings("all")
 public class RetryConfig {
     private int retryMaxTime;
     private int retryMinTime;

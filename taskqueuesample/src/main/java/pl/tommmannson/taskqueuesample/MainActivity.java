@@ -57,6 +57,8 @@ public class MainActivity extends AppCompatActivity implements OnManagerReadyLis
 
                 JobInfo.Builder builder = TaskScheduler.buildJob(2);
                 builder.setRequiredNetworkType(NETWORK_TYPE_ANY);
+//                        .setRequiresCharging(true);
+//                        .setOverrideDeadline(10 * 1000);
                 task2.schedule(builder);
             }
         });

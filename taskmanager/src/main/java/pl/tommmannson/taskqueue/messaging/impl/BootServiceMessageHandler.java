@@ -3,6 +3,8 @@ package pl.tommmannson.taskqueue.messaging.impl;
 import android.content.Context;
 import android.content.Intent;
 
+import java.security.InvalidParameterException;
+
 import pl.tommmannson.taskqueue.TaskManager;
 import pl.tommmannson.taskqueue.TaskQueueThread;
 import pl.tommmannson.taskqueue.TaskSchedulerThread;
@@ -80,7 +82,7 @@ public class BootServiceMessageHandler implements MessageHandler<BootServiceMess
             TaskManager.RequestServiceConnection connection = message.getTaskManager().new RequestServiceConnection();
             context.bindService(new Intent(context, config.getClassOfService()), connection, Context.BIND_AUTO_CREATE);
         } else {
-
+            throw new InvalidParameterException("context cant be null");
         }
     }
 

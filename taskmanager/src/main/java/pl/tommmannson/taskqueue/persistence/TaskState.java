@@ -10,9 +10,9 @@ import pl.tommmannson.taskqueue.TaskResult;
 
 public class TaskState<T extends Serializable> implements Serializable {
 
-    TaskStatus status = TaskStatus.NotExistsInQueue;
-    T result = null;
-    Exception exception = null;
+    private TaskStatus status = TaskStatus.NotExistsInQueue;
+    private T result = null;
+    private Exception exception = null;
 
     public TaskStatus getStatus() {
         return status;

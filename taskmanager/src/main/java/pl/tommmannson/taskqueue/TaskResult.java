@@ -14,7 +14,6 @@ public class TaskResult<RESULT> implements Serializable {
     public static final int TYPE_ERROR = 4;
     public static final int TYPE_CANCEL = 5;
 
-    private Class<?> targetClazz;
     protected Object resultData;
     protected int typeOfMessage;
 
@@ -24,39 +23,42 @@ public class TaskResult<RESULT> implements Serializable {
 
     }
 
-    void setTargetType(Class<?> clazz){
-        this.targetClazz = clazz;
-    }
-
+    @SuppressWarnings("unused")
     public static <RESULT> TaskResult<RESULT> startResult(RESULT result){
         return new TaskResult<>(result, TYPE_STARTED);
     }
 
+    @SuppressWarnings("unused")
     public static <RESULT> TaskResult<RESULT> progressResult(RESULT result){
         return new TaskResult<>(result, TYPE_PROGRESS);
     }
 
+    @SuppressWarnings("unused")
     public static <RESULT> TaskResult<RESULT> stopedResult(RESULT result){
         return new TaskResult<>(result, TYPE_STOPPED);
     }
 
+    @SuppressWarnings("unused")
     public static <RESULT> TaskResult<RESULT> finishResult(RESULT result){
         return new TaskResult<>(result, TYPE_FINISHED);
     }
 
+    @SuppressWarnings("unused")
     public static <RESULT> TaskResult<RESULT> errorResult(RESULT result){
         return new TaskResult<>(result, TYPE_ERROR);
     }
 
+    @SuppressWarnings("unused")
     public static <RESULT> TaskResult<RESULT> cancelResult(RESULT result){
         return new TaskResult<>(result, TYPE_CANCEL);
     }
 
-
+    @SuppressWarnings("unused")
     Object getResultDataRaw() {
         return resultData;
     }
 
+    @SuppressWarnings("unused, unchecked")
     public <T> T getResultData() {
         return (T) resultData;
     }
@@ -87,9 +89,5 @@ public class TaskResult<RESULT> implements Serializable {
 
     public boolean isCanceled(){
         return typeOfMessage == TYPE_CANCEL;
-    }
-
-    public Class<?> getTargetType() {
-        return targetClazz;
     }
 }

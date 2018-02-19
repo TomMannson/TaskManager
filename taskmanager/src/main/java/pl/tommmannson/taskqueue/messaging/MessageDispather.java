@@ -22,10 +22,9 @@ import pl.tommmannson.taskqueue.messaging.impl.UnregisterCallbackMessageHandler;
 
 public class MessageDispather {
 
-    private final Thread dispatherThread;
     private final MessageFactory messageFactory;
-    Handler dispatherHandler = null;
-    static MessageHandlerMap map = new MessageHandlerMap();
+    private Handler dispatherHandler = null;
+    private static MessageHandlerMap map = new MessageHandlerMap();
 
     static{
         map.put(BootServiceMessage.class, new BootServiceMessageHandler());
@@ -38,12 +37,12 @@ public class MessageDispather {
 
     public MessageDispather(MessageFactory factory){
         this.messageFactory = factory;
-        dispatherThread = new Thread("Dispather thread"){
+        Thread dispatherThread = new Thread("Dispather thread") {
             @Override
             public void run() {
                 super.run();
                 Looper.prepare();
-                dispatherHandler = new Handler(Looper.myLooper()){
+                dispatherHandler = new Handler(Looper.myLooper()) {
                     @Override
                     public void handleMessage(android.os.Message msg) {
                         Message message = (Message) msg.obj;
