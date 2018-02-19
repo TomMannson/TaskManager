@@ -56,7 +56,7 @@ public class MainActivity extends AppCompatActivity implements OnManagerReadyLis
             public void onClick(View view) {
 
                 JobInfo.Builder builder = TaskScheduler.buildJob(2);
-                builder.setRequiredNetworkType(NETWORK_TYPE_ANY);
+                builder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_UNMETERED);
 //                        .setRequiresCharging(true);
 //                        .setOverrideDeadline(10 * 1000);
                 task2.schedule(builder);
