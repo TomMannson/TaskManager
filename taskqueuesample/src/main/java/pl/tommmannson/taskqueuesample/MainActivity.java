@@ -18,6 +18,8 @@ import pl.tommmannson.taskqueue.progress.ErrorCallback;
 import pl.tommmannson.taskqueue.progress.OnManagerReadyListener;
 import pl.tommmannson.taskqueue.progress.ResultCallback;
 
+import static android.app.job.JobInfo.NETWORK_TYPE_ANY;
+
 public class MainActivity extends AppCompatActivity implements OnManagerReadyListener, ErrorCallback {
 
     final static String downloadItemsRequest = "downloadItemsRequest";
@@ -54,6 +56,7 @@ public class MainActivity extends AppCompatActivity implements OnManagerReadyLis
             public void onClick(View view) {
 
                 JobInfo.Builder builder = TaskScheduler.buildJob(2);
+                builder.setRequiredNetworkType(NETWORK_TYPE_ANY);
                 task2.schedule(builder);
             }
         });

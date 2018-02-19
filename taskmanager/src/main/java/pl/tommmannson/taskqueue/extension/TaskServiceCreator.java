@@ -3,61 +3,34 @@ package pl.tommmannson.taskqueue.extension;
 
 import android.app.job.JobParameters;
 import android.app.job.JobService;
-import android.content.ContextWrapper;
 import android.os.Build;
-import android.os.Handler;
-import android.os.Looper;
-import android.os.Message;
+import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
-import android.util.Log;
 
-import pl.tommmannson.taskqueue.JobInvokation;
+import pl.tommmannson.taskqueue.Task;
 import pl.tommmannson.taskqueue.TaskManager;
-import pl.tommmannson.taskqueue.TaskShedulerThread;
+import pl.tommmannson.taskqueue.TaskSchedulerThread;
 
 /**
  * Created by tomasz.krol on 2018-02-08.
  */
 
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-public class TaskServiceCreator extends JobService implements Handler.Callback {
+public class TaskServiceCreator extends JobService {
 
     @Override
     public boolean onStartJob(final JobParameters job) {
 
-        final TaskManager manager = TaskManager.getInstance(job.getExtras().getInt("MANAGER_ID"));
-        TaskShedulerThread tasks = (TaskShedulerThread) manager.getService();
-
-        final Handler handler = new Handler(Looper.getMainLooper(), this);
-
-        if (tasks == null) {
-            Thread t = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    TaskShedulerThread tasks = (TaskShedulerThread) manager.getService();
-                    while (tasks == null) {
-                        Log.d("TASK_QUEUE", "not initilised");
-                        Thread.yield();
-                        tasks = (TaskShedulerThread) manager.getService();
-                    }
-                    Log.d("TASK_QUEUE", "initilised");
-                    try {
-                        Thread.sleep(10000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    JobInvokation invocation = tasks.createNew(job, TaskServiceCreator.this);
-                    invocation.invoke();
-                    Log.d("TASK_QUEUE", "task_started");
-
-                }
-            });
-            t.start();
-            ContextWrapper wraper = new ContextWrapper(this);
-        } else {
-            JobInvokation invocation = tasks.createNew(job, this);
-            invocation.invoke();
-        }
+        Thread t = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                final TaskManager manager = TaskManager.getInstance(job.getExtras().getInt("MANAGER_ID"));
+                TaskSchedulerThread tasks = getTasksOrWait(manager);
+                tasks.createNew(job, TaskServiceCreator.this)
+                        .invoke();
+            }
+        });
+        t.start();
         return true;
     }
 
@@ -65,14 +38,27 @@ public class TaskServiceCreator extends JobService implements Handler.Callback {
     public boolean onStopJob(JobParameters job) {
 
         TaskManager manager = TaskManager.getInstance(job.getExtras().getInt("MANAGER_ID"));
-        TaskShedulerThread tasks = (TaskShedulerThread) manager.getService();
-        JobInvokation invocation = tasks.createNew(job, this);
-        return invocation.invokeError();//job.shouldReplaceCurrent() && tasks
+        ;
+        TaskSchedulerThread tasks = (TaskSchedulerThread) manager.getService();
+        if (tasks == null) {
+            return true;
+        }
+        Task task = tasks.findTaskById(job.getExtras().getString("TAG"));
+        if (task == null) {
+            return false;
+        }
+
+        return tasks.createNew(job, this)
+                .invokeError();
     }
 
-    @Override
-    public boolean handleMessage(Message msg) {
-
-        return false;
+    @NonNull
+    private TaskSchedulerThread getTasksOrWait(TaskManager manager) {
+        TaskSchedulerThread tasks = (TaskSchedulerThread) manager.getService();
+        while (tasks == null) {
+            Thread.yield();
+            tasks = (TaskSchedulerThread) manager.getService();
+        }
+        return tasks;
     }
 }

@@ -18,6 +18,7 @@ import pl.tommmannson.taskqueue.progress.OnManagerReadyListener;
 @TargetApi(Build.VERSION_CODES.LOLLIPOP)
 public class TaskScheduler {
 
+    public static final int SCHEDULER_ID = -150;
     public static final Class<?> TAG = TaskScheduler.class;
 
     TaskManager manager = null;
@@ -58,13 +59,13 @@ public class TaskScheduler {
 
     public static TaskScheduler getInstance() {
 
-        TaskManager manager = TaskManager.getInstance(-150);
+        TaskManager manager = TaskManager.getInstance(SCHEDULER_ID);
         return new TaskScheduler(manager);
     }
 
     public static <T extends Task> JobInfo.Builder buildJob(int jobId)  {
 
-        TaskManager manager = TaskManager.getInstance(-150);
+        TaskManager manager = TaskManager.getInstance(SCHEDULER_ID);
 
         JobInfo.Builder builder =
                 new JobInfo.Builder(jobId, new ComponentName(manager.configuration.getContext(), TaskServiceCreator.class));

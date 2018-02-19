@@ -5,7 +5,6 @@ import android.app.job.JobInfo;
 import android.app.job.JobParameters;
 import android.app.job.JobScheduler;
 import android.app.job.JobService;
-import android.content.ComponentName;
 import android.content.Context;
 import android.os.Build;
 import android.os.PersistableBundle;
@@ -22,7 +21,6 @@ import pl.tommmannson.taskqueue.bootstraping.TaskManagementInterface;
 import pl.tommmannson.taskqueue.cancelation.CancelationToken;
 import pl.tommmannson.taskqueue.config.TaskManagerConfiguration;
 import pl.tommmannson.taskqueue.config.di.DependencyInjector;
-import pl.tommmannson.taskqueue.extension.TaskServiceCreator;
 import pl.tommmannson.taskqueue.persistence.Serializer;
 import pl.tommmannson.taskqueue.persistence.TaskStatus;
 import pl.tommmannson.taskqueue.persistence.serialization.FileSerializer;
@@ -30,16 +28,14 @@ import pl.tommmannson.taskqueue.persistence.sqlite.SqlSerializer;
 import pl.tommmannson.taskqueue.progress.TaskCallback;
 import pl.tommmannson.taskqueue.queues.TaskQueue;
 
-import static android.app.job.JobInfo.NETWORK_TYPE_ANY;
-
 /**
  * Created by tomasz.krol on 2016-12-06.
  */
 
 @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-public class TaskShedulerThread implements Bootable, TaskManagementInterface {
+public class TaskSchedulerThread implements Bootable, TaskManagementInterface {
 
-    static public final Class<?> TAG = TaskShedulerThread.class;
+    static public final Class<?> TAG = TaskSchedulerThread.class;
     private final Context ctx;
 
     private Map<String, List<TaskCallback>> callbacks = new HashMap<>();
@@ -55,7 +51,7 @@ public class TaskShedulerThread implements Bootable, TaskManagementInterface {
     private boolean tasksLoadedFlag;
     private int serialisationType;
 
-    public TaskShedulerThread(Context ctx) {
+    public TaskSchedulerThread(Context ctx) {
         this.ctx = ctx;
         this.dispather = (JobScheduler) ctx.getSystemService(Context.JOB_SCHEDULER_SERVICE);
     }
@@ -212,8 +208,8 @@ public class TaskShedulerThread implements Bootable, TaskManagementInterface {
         workerThreadPool.shutdown();
     }
 
-    public JobInvokation createNew(JobParameters job, JobService service) {
-        JobInvokation invokation = new JobInvokation(job, service);
+    public JobInvocation createNew(JobParameters job, JobService service) {
+        JobInvocation invokation = new JobInvocation(job, service);
         invokation.init(tasks, callbacks, cancelation, injector, serializer);
         return invokation;
     }

@@ -5,7 +5,9 @@ package pl.tommmannson.taskqueue;
 
 import android.app.job.JobInfo;
 
+import java.io.InvalidClassException;
 import java.io.Serializable;
+import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +24,8 @@ import pl.tommmannson.taskqueue.persistence.TaskStatus;
 import pl.tommmannson.taskqueue.progress.ProgressManager;
 import pl.tommmannson.taskqueue.progress.TaskCallback;
 import pl.tommmannson.taskqueue.scheduler.RetrySchedulerFactory;
+
+import static pl.tommmannson.taskqueue.TaskScheduler.SCHEDULER_ID;
 
 
 /**
@@ -63,6 +67,9 @@ public abstract class Task<T extends Serializable, Progress> implements Serializ
     }
 
     public void schedule(JobInfo.Builder builder) {
+        if(this.taskmanager.getId() != SCHEDULER_ID){
+            throw new InvalidParameterException("task created by TaskManager can't be scheduled");
+        }
         taskmanager.doTask(this, builder);
     }
 

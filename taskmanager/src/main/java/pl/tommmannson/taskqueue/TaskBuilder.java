@@ -12,8 +12,8 @@ public class TaskBuilder<T extends Task> {
     Class<T> taskClass;
 
     TaskManager manager;
-    TaskParams params = new TaskParams();
-    String id;
+    private TaskParams params = new TaskParams();
+    private String id;
 
     public TaskBuilder(Class<T> taskClass) {
         this.taskClass = taskClass;

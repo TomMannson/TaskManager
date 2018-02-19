@@ -23,7 +23,8 @@ import pl.tommmannson.taskqueue.progress.TaskCallback;
  * Created by tomasz.krol on 2018-02-08.
  */
 @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-public class JobInvokation implements Runnable {
+/*hide*/
+public class JobInvocation implements Runnable {
 
     private Map<String, List<TaskCallback>> callbacks = new HashMap<>();
     private Map<Task<?, ?>, CancelationToken> cancelation = new HashMap<>();
@@ -34,38 +35,13 @@ public class JobInvokation implements Runnable {
     private final JobParameters job;
     private JobService service;
 
-    JobInvokation(JobParameters job, JobService service) {
+    JobInvocation(JobParameters job, JobService service) {
 
         this.service = service;
         this.job = job;
     }
 
     public void invoke() {
-        Thread thread = new Thread(this);
-        thread.start();
-    }
-
-    public boolean invokeError() {
-
-        if (tasks.get(job.getExtras().getString("TAG")).getState().getStatus() == TaskStatus.FailFinished) {
-            Thread thread = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    JobInvokation.this.invokeError();
-                }
-            });
-            thread.start();
-            return false;
-        } else if (tasks.get(job.getExtras().getString("TAG"))
-                .getState().getStatus() == TaskStatus.AddedToQueue) {
-            return true;
-        }
-        return true;
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public void run() {
         Task request = null;
         try {
 
@@ -99,26 +75,10 @@ public class JobInvokation implements Runnable {
             ex.printStackTrace();
 
             if (request != null) {
-//                if (request.nextRetry()) {
-//                    //concurrentTaskQueue.moveFromExecutingToWaiting(request);
-//                    final Task requestToRetry = request;
-//                    concurrentTaskQueue.moveToPending(requestToRetry, new RetryOperation() {
-//                        @Override
-//                        public void doOnRetry() {
-//                            if (!cancelation.get(requestToRetry).isCanceled()) {
-//                                workerThreadPool.execute(TaskQueueThread.this);
-//                            }
-//                        }
-//                    });
-////                        workerThreadPool.execute(this);
-//                } else {
-//                    concurrentTaskQueue.removeProcessing(request);
-//                }
+                boolean needResheduling = request.nextRetry();
 
                 request.setExecutionStatus(TaskStatus.FailFinished);
-                service.jobFinished(job, false);
-
-
+                service.jobFinished(job, needResheduling);
             }
         } finally {
             if (request != null) {
@@ -127,6 +87,24 @@ public class JobInvokation implements Runnable {
                 serializer.persist(null, request);
             }
         }
+    }
+
+    public boolean invokeError() {
+
+        if (tasks.get(job.getExtras().getString("TAG"))
+                .getState().getStatus() == TaskStatus.FailFinished) {
+            return false;
+        } else if (tasks.get(job.getExtras().getString("TAG"))
+                .getState().getStatus() == TaskStatus.AddedToQueue) {
+            return true;
+        }
+        return true;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public void run() {
+
     }
 
     @SuppressWarnings("unchecked")

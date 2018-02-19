@@ -5,7 +5,7 @@ import android.content.Intent;
 
 import pl.tommmannson.taskqueue.TaskManager;
 import pl.tommmannson.taskqueue.TaskQueueThread;
-import pl.tommmannson.taskqueue.TaskShedulerThread;
+import pl.tommmannson.taskqueue.TaskSchedulerThread;
 import pl.tommmannson.taskqueue.config.TaskManagerConfiguration;
 import pl.tommmannson.taskqueue.messaging.MessageHandler;
 
@@ -21,7 +21,7 @@ public class BootServiceMessageHandler implements MessageHandler<BootServiceMess
         TaskManagerConfiguration configuration = message.getConfig();
 
         if (configuration.isJobDispatherMode()) {
-            TaskShedulerThread service = new TaskShedulerThread(message.getAppContext());
+            TaskSchedulerThread service = new TaskSchedulerThread(message.getAppContext());
             service.configure(configuration);
             service.setQueueId(manager.getId());
             service.start();
